@@ -12,7 +12,7 @@ public class DCMlogic {
 	float twoKpDef = (2.0f * 5f);
 	public float q0 = 1, q1 = 0, q2 = 0, q3 = 0;
 	float twoKp = twoKpDef;
-	float LSBtoRadiant = 802.1409132f;
+	float LSBtoRadiant = 1.99464953336f; //4.36332313 radiantper seconds
 	
 	Vector3f gyro=new Vector3f(), acc=new Vector3f(), magn=new Vector3f();
 	
@@ -27,7 +27,7 @@ public class DCMlogic {
 	private float	qPred3;
 
 	private float	qPred4;
-	void MadgwickAHRSupdate(float gx, float gy, float gz, float ax, float ay, float az, float mx, float my, float mz) {
+	public void MadgwickAHRSupdate(float gx, float gy, float gz, float ax, float ay, float az, float mx, float my, float mz) {
 		if (count == -1){ //just the first time!
 			lastFreqUp = System.currentTimeMillis();
 		}

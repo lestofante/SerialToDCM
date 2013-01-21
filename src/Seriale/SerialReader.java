@@ -1,82 +1,148 @@
-package myGame;
+package Seriale;
+
+import gnu.io.CommPort;
+import gnu.io.CommPortIdentifier;
+import gnu.io.SerialPort;
+import gnu.io.SerialPortEvent;
+import gnu.io.SerialPortEventListener;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.util.Date;
-import java.util.Timer;
-import java.util.TimerTask;
 
-import com.jme3.math.FastMath;
+import myGame.DCMlogic;
+
 import com.jme3.math.Vector3f;
 
-public class SocketReader implements Runnable{
-	
-	//public static void main(String args[]){
-		//main for test
-		//SocketReader s = new SocketReader();
-		//s.connect();
-	//}
 
-	Socket reader = new Socket();
-	private boolean leggi;
+public class SerialReader implements SerialPortEventListener {
+	private final DCMlogic dcm;
 	
-	final DCMlogic dcm;
+	private SerialPort serial;
 	
-	public SocketReader(DCMlogic dcm){
+	int baudRate = 460800;
+	
+	InputStream input;
+	
+	public SerialReader(DCMlogic dcm) {
+		RXTXPathSetter.setPaths();
 		this.dcm = dcm;
 	}
+
+	public void chiudi(){
+		chiudi=true;
+	}
 	
-	public void connect(){
-		System.out.println("Starto tutto");
-		leggi = false;
+
+	String buffer = "";
+	byte tmp[] = new byte[1024];
+	
+	boolean alto = false;
+	int conta = 0, soglia = 50;
+	long time = System.currentTimeMillis(), totalOuts=0;
+
+	private boolean chiudi=false;
+
+	private boolean connected;
+	
+	public void connect() {
 		try {
-			reader.connect(new InetSocketAddress("10.8.0.6", 2345),5000);
-			leggi = true;
-			Thread thread = new Thread(this);
-			thread.setDaemon(true);
-			thread.start();
-		} catch (IOException e) {
-			System.out.println("Connection failed. DEBUG MODE");
-			//connection failed fallback on debug mode
-			Timer timer = new Timer(true);
-			timer.scheduleAtFixedRate(new TimerTask() {
-				
-				@Override
-				public void run() {
-					float f = FastMath.sin(System.nanoTime()/500000000f)*2f;
-					dcm.MadgwickAHRSupdate(f, f, 0, 0, 0, 1, 1, 0, 0);//bha, if you say so (i know, that what SHE said)
+			String portName="";
+			if ( portName.equals("") ){
+				portName = "/dev/ttyUSB0";
+			}
+			System.out.println("Apro la porta: " + portName);
+			CommPortIdentifier portIdentifier = CommPortIdentifier
+					.getPortIdentifier(portName);
+
+			if (portIdentifier.isCurrentlyOwned()) {
+				System.out.println("Errore: La porta è in uso");
+				// info.append("\nErrore: La porta è in uso");
+			} else {
+				CommPort commPort = portIdentifier.open(this.getClass()
+						.getName(), baudRate);
+
+				if (commPort instanceof SerialPort) {
+					serial = (SerialPort) commPort;
+					serial.setSerialPortParams(baudRate, SerialPort.DATABITS_8,
+							SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
+					setConnected(true);
+					input = serial.getInputStream();
+
+					// (new Thread(inputSeriale)).start();
+					// OutputStream out = serialPort.getOutputStream();
+
+					// (new Thread(new SerialWriter(out))).start();
+					serial.addEventListener(this);
+					
+					serial.notifyOnDataAvailable(true);
+
+					byte[] b = new byte[1];
+					for (int i = 0; i < b.length; i++) {
+						b[i] = 'a';
+					}
+					serial.getOutputStream().write(b);
+					// info.append("\nConnesso alla porta seriale: "+portName);
+				} else {
+					System.out
+							.println("Errore: non è ��  porta seriale valida.");
+					// info.append("\nErrore: non è una <--?? porta seriale valida");
 				}
-			}, new Date(), 1);
+			}
+		} catch (Exception e) {
+			setConnected(false);
+			// info.append("\nErrore di connessione seriale con la porta: " +
+			// portName);
 			e.printStackTrace();
 		}
 	}
+	
 	@Override
-	public void run() {
-		InputStream inputStream;
+	public void serialEvent(SerialPortEvent arg0) {
+
 		try {
-			inputStream = reader.getInputStream();
-			while (leggi){
-				if (inputStream.available()>0){
-					byte[] read = new byte[inputStream.available()];
-					inputStream.read(read);
-					analyze(read);
-				} else {
-					try {
-						Thread.sleep(1);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
+			
+			if( input.available() > 0 ){
+				int len = input.read(tmp);
+				
+				//System.out.println(new String(tmp));
+				/*
+				for (int i=0;i<len;i++){
+					System.out.println( tmp[i]&0xffff);
 				}
-				//il mio procio ringrazia
+				*/
+				
+				byte[] outTemp = new byte[len];
+				System.arraycopy(tmp, 0, outTemp, 0, len);
+				System.out.print(new String(outTemp, "ASCII"));
+				
+				analyze(outTemp);
+				
+				/* roba di debug */
+				totalOuts+=len;
+				if (time +1000 <= System.currentTimeMillis()){
+					System.out.println("byte al secondo:"+totalOuts);
+					totalOuts=0;
+					time = System.currentTimeMillis();
+				}
+				
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			chiudi();
+		}
+		
+		if (chiudi){
+			try {
+				input.close();
+				System.out.println("flusso da seriale chiuso, ma mancano: "+input.available());
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
+
 	int offset = -1;
 	private byte tipoSensore;
 	private int val;
@@ -173,34 +239,18 @@ public class SocketReader implements Runnable{
 					readLAbyte(read[i]);
 					temp.z = val;					
 					if (choosen != 0){
-						//if(choosen.equals(gyroQueue))
-						//	temp.z += 26;
-						//choosen.add(temp);
-						float swap;
+						
+						//float swap;
 						
 						if (choosen==1){
-							temp.z *= -1;
-							
-							swap = temp.y;
-							temp.y = temp.x;
-							temp.x = swap;
-							
 							gyroVec = temp;
 						}
 						
 						if (choosen==2){//ACC
-							swap = temp.y;
-							temp.y = -temp.x;
-							temp.x = -swap;
-							
 							accVec = temp;
 						}
 						
 						if (choosen==3){
-							temp.z *= -1;
-							
-							temp.x *= -1;
-							
 							magVec = temp;
 						}
 						choosen=0;
@@ -234,7 +284,7 @@ public class SocketReader implements Runnable{
 				return i-index;
 			}
 			if (read[i]==65 || read[i]==71 || read[i]==77){
-				System.out.println("Alternative find ok");
+				System.out.println("Alternative find ok"); //charset problem? maybe 16bit vs 8 bit?
 				return i-index;
 			}
 		}
@@ -259,4 +309,13 @@ public class SocketReader implements Runnable{
 		// signed/unsigned se avessi usato +)
 		val |= tmp;
 	}
+
+	public boolean isConnected() {
+		return connected;
+	}
+
+	private void setConnected(boolean connected) {
+		this.connected = connected;
+	}
+	
 }

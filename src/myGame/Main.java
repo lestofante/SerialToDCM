@@ -5,6 +5,7 @@ import DCM.AcceControl;
 import DCM.DCMControl;
 import DCM.MagControl;
 import DCM.GyroControl;
+import Seriale.SerialReader;
 
 import com.jme3.app.SimpleApplication;
 import com.jme3.math.ColorRGBA;
@@ -42,7 +43,7 @@ public class Main extends SimpleApplication implements ScreenController {
 	
 	DCMlogic dcm = new DCMlogic();
 	
-	SocketReader socket = new SocketReader(dcm);
+	SerialReader serial = new SerialReader(dcm);
 	
 	private Nifty				nifty;
 	
@@ -90,7 +91,7 @@ public class Main extends SimpleApplication implements ScreenController {
 		
 		initializeGUI();
 		
-		socket.connect();
+		serial.connect();
 		/**
 		Initialize GUI
 		final NiftyJmeDisplay niftyDisplay = new NiftyJmeDisplay(assetManager,
