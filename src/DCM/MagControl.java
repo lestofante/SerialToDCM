@@ -47,6 +47,7 @@ public class MagControl extends AbstractControl {
 		Quaternion q = new Quaternion();
 		q.lookAt(temp, Vector3f.UNIT_Y);
 		getSpatial().setLocalRotation(q);
+		
 	}
 
 }

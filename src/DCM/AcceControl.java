@@ -48,6 +48,7 @@ public class AcceControl extends AbstractControl {
 		q.lookAt(temp, Vector3f.UNIT_Y);
 		getSpatial().setLocalRotation(q);
 		
+		
 	}
 
 }

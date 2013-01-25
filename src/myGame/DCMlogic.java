@@ -14,7 +14,7 @@ public class DCMlogic {
 	float twoKp = twoKpDef;
 	float LSBtoRadiant = 1.99464953336f; //4.36332313 radiantper seconds
 	
-	Vector3f gyro=new Vector3f(), acc=new Vector3f(), magn=new Vector3f();
+	Vector3f gyro=new Vector3f(), acc=new Vector3f(), magn=new Vector3f(), simpleGyro=new Vector3f();
 	
 	
 	//long lastUp = System.nanoTime();
@@ -61,6 +61,7 @@ public class DCMlogic {
 			gz = gz / LSBtoRadiant;
 			
 			gyro = gyro.add( new Vector3f(gx, gy, gz).mult(1.0f/sampleFreq) );//lol, simple integration?
+			simpleGyro = new Vector3f(gx, gy, gz);
 			//gyro = new Vector3f(gx, gy, gz).mult(1.0f/sampleFreq);
 
 			acc = new Vector3f(ax, ay, az);
@@ -326,6 +327,12 @@ public class DCMlogic {
 	public Vector3f getGyro() {
 		synchronized (sincronizzaUpdate) {
 			return new Vector3f(gyro); //copy!
+		}
+	}
+	
+	public Vector3f getSimpleGyro() {
+		synchronized (sincronizzaUpdate) {
+			return new Vector3f(simpleGyro); //copy!
 		}
 	}
 	

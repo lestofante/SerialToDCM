@@ -1,4 +1,4 @@
-package Seriale;
+package test;
 
 import gnu.io.CommPort;
 import gnu.io.CommPortIdentifier;
@@ -8,14 +8,12 @@ import gnu.io.SerialPortEventListener;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 
-import myGame.DCMlogic;
+import Seriale.RXTXPathSetter;
 
 import com.jme3.math.Vector3f;
 
-public class SerialReader implements SerialPortEventListener {
-	private final DCMlogic dcm;
+public class SerialReaderDebug implements SerialPortEventListener {
 
 	private SerialPort serial;
 
@@ -24,14 +22,13 @@ public class SerialReader implements SerialPortEventListener {
 	InputStream input;
 
 	public static void main(String args[]) {
-		SerialReader read = new SerialReader(null);
+		SerialReaderDebug read = new SerialReaderDebug();
 
 		read.connect();
 	}
 
-	public SerialReader(DCMlogic dcm) {
+	public SerialReaderDebug() {
 		RXTXPathSetter.setPaths();
-		this.dcm = dcm;
 	}
 
 	public void chiudi() {
@@ -39,7 +36,7 @@ public class SerialReader implements SerialPortEventListener {
 	}
 
 	String buffer = "";
-	byte tmp[] = new byte[5000];
+	byte tmp[] = new byte[20];
 
 	boolean alto = false;
 	int conta = 0, soglia = 50;
@@ -113,14 +110,14 @@ public class SerialReader implements SerialPortEventListener {
 				byte[] outTemp = new byte[len];
 				System.arraycopy(tmp, 0, outTemp, 0, len);
 
-				/*
+/*				
 				for (int i = 0; i < len; i++) {
 					System.out.print((outTemp[i]) + " ");
 				}
-				
+*/				
 
-				System.out.println("letti: "+len+" byte");
-				*/
+				//System.out.println("letti: "+len+" byte");
+
 				analyze(outTemp);
 
 				/* roba di debug */
@@ -153,8 +150,10 @@ public class SerialReader implements SerialPortEventListener {
 	int offset = -1;
 	private byte tipoSensore;
 	private long val;
+	private long valReverse;
 	Vector3f temp = new Vector3f();
 	Vector3f magVec, accVec, gyroVec;
+	Vector3f magVecOld, accVecOld, gyroVecOld;
 	int choosen = 0;
 
 	private synchronized void analyze(byte[] read) {
@@ -163,7 +162,7 @@ public class SerialReader implements SerialPortEventListener {
 			// we don't know where we are on the stream. find occurence of "A",
 			// "G" and "M" to find it
 			int index = findOccurence(read, 0);
-			//System.out.println("Index: " + index);
+			System.out.println("Index: " + index);
 			int tmpIndex = index;
 			boolean ok = true;
 			if (tmpIndex < 0) {
@@ -171,25 +170,23 @@ public class SerialReader implements SerialPortEventListener {
 			}
 			while (tmpIndex >= 0 && tmpIndex < read.length) {
 				System.out.println("check index is looking at " + tmpIndex);
-				if (!(read[tmpIndex] == 'A') && !(read[tmpIndex] == 'G')
-						&& !(read[tmpIndex] == 'M')) {
-					System.out.println("Continuity error on index: " + tmpIndex
-							+ " is: " + read[tmpIndex] + " len is: "
-							+ read.length);
+				if (!(read[tmpIndex] == 'A') && !(read[tmpIndex] == 'G') && !(read[tmpIndex] == 'M')) {
+					//System.out.println("Continuity error on index: " + tmpIndex + " is: " + read[tmpIndex] + " len is: " + read.length);
+					/*
 					try {
-						System.out.println("Checked string is: "
-								+ new String(read, "ASCII"));
+						System.out.println("Checked string is: "+ new String(read, "ASCII"));
 					} catch (UnsupportedEncodingException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
+					*/
 					ok = false;
 					break;
 				}
 				tmpIndex += 7;
 			}
 			if (ok == true) {
-				System.out.println("Setting index: " + index);
+				//System.out.println("Setting index: " + index);
 				offset = -index;
 				analyze(read);
 				return;
@@ -285,22 +282,37 @@ public class SerialReader implements SerialPortEventListener {
 				}
 				// magVec=null;
 
-				if (gyroVec != null && accVec != null && magVec != null) {
+				if (magVec != null){
 					// System.out.println("distanza: "+accVec.subtract(magVec)+" dist: "+accVec.distance(magVec));
-					if (dcm != null) {
-						dcm.MadgwickAHRSupdate(gyroVec.x, gyroVec.y, gyroVec.z,
-								accVec.x, accVec.y, accVec.z, magVec.x,
-								magVec.y, magVec.z);
+					if (magVecOld == null){
+						magVecOld = magVec;
 					}
-					gyroVec = accVec = magVec = null;
-					choosen = 0;
-
-				} else if (gyroVec != null && accVec != null) {
-					// dcm.MadgwickAHRSupdate(gyroVec.x, gyroVec.y, gyroVec.z,
-					// accVec.x, accVec.y, accVec.z, 0, 0, 0);
-					// gyroVec = accVec = null;
-					// choosen = 0;
+					if (!magVec.equals(magVecOld)){
+						System.out.println("magne cambiato!"+magVec+" "+magVecOld+" distanza: "+magVec.distance(magVecOld));
+						magVecOld = magVec;
+					}
 				}
+				
+				if (accVec != null){
+					if (accVecOld == null){
+						accVecOld = accVec;
+					}
+					if (!accVec.equals(accVecOld)){
+						System.out.println("acc cambiato!"+accVec+" "+accVecOld+" distanza: "+accVec.distance(accVecOld));
+						accVecOld = accVec;
+					}
+				}
+				if (gyroVec!=null){
+					if (gyroVecOld == null){
+						gyroVecOld = gyroVec;
+					}
+					if (!gyroVec.equals(gyroVecOld)){
+						System.out.println("gyro cambiato!"+gyroVec+" "+gyroVecOld+" distanza: "+gyroVecOld.distance(gyroVec));
+						gyroVecOld = gyroVec;
+					}
+				}
+				
+				gyroVec = accVec = magVec = null;
 			}
 		}
 
@@ -308,7 +320,7 @@ public class SerialReader implements SerialPortEventListener {
 
 	private int findOccurence(byte[] read, int index) {
 		for (int i = index; i < read.length; i++) {
-			System.out.print(read[i] + " ");
+			//System.out.print(read[i] + " ");
 			if (read[i] == 'A' || read[i] == 'G' || read[i] == 'M') {
 				return i - index;
 			}
@@ -319,7 +331,7 @@ public class SerialReader implements SerialPortEventListener {
 				return i - index;
 			}
 		}
-		System.out.println();
+		//System.out.println();
 		return -1;
 	}
 
@@ -331,6 +343,9 @@ public class SerialReader implements SerialPortEventListener {
 		// così il dato (or logico, per evitare casini con i signed/unsigned se
 		// avessi usato +)
 		val |= tmp & 0xff;
+		
+		//reverse!
+		valReverse |= tmp&0xff<<8;
 	}
 
 	private void readMSbyte(byte tmp) {
@@ -339,6 +354,11 @@ public class SerialReader implements SerialPortEventListener {
 		// e metti il valore di tmp in val (or logico, per evitare casini con i
 		// signed/unsigned se avessi usato +)
 		val |= tmp;
+		
+		//reverse!
+		
+		valReverse = 0;
+		valReverse |= tmp & 0xff;
 	}
 
 	public boolean isConnected() {
