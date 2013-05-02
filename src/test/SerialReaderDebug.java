@@ -9,8 +9,6 @@ import gnu.io.SerialPortEventListener;
 import java.io.IOException;
 import java.io.InputStream;
 
-import Seriale.RXTXPathSetter;
-
 import com.jme3.math.Vector3f;
 
 public class SerialReaderDebug implements SerialPortEventListener {
@@ -28,7 +26,7 @@ public class SerialReaderDebug implements SerialPortEventListener {
 	}
 
 	public SerialReaderDebug() {
-		RXTXPathSetter.setPaths();
+		reader.seriale.RXTXPathSetter.setPaths();
 	}
 
 	public void chiudi() {
@@ -150,7 +148,6 @@ public class SerialReaderDebug implements SerialPortEventListener {
 	int offset = -1;
 	private byte tipoSensore;
 	private long val;
-	private long valReverse;
 	Vector3f temp = new Vector3f();
 	Vector3f magVec, accVec, gyroVec;
 	Vector3f magVecOld, accVecOld, gyroVecOld;
@@ -345,7 +342,7 @@ public class SerialReaderDebug implements SerialPortEventListener {
 		val |= tmp & 0xff;
 		
 		//reverse!
-		valReverse |= tmp&0xff<<8;
+		//valReverse |= tmp&0xff<<8;
 	}
 
 	private void readMSbyte(byte tmp) {
@@ -357,8 +354,8 @@ public class SerialReaderDebug implements SerialPortEventListener {
 		
 		//reverse!
 		
-		valReverse = 0;
-		valReverse |= tmp & 0xff;
+		//valReverse = 0;
+		//valReverse |= tmp & 0xff;
 	}
 
 	public boolean isConnected() {

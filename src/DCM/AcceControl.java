@@ -39,13 +39,13 @@ public class AcceControl extends AbstractControl {
 			//since we have different samplerates should we only get the last full information triplet
 		
 		Vector3f temp = dcm.getAcc();	
-		
+		/*
 		float a = temp.z;
 		temp.z = temp.y;
 		temp.y = a;
-		
+		*/
 		Quaternion q = new Quaternion();
-		q.lookAt(temp, Vector3f.UNIT_Y);
+		q.lookAt(temp, Vector3f.UNIT_Z);
 		getSpatial().setLocalRotation(q);
 		
 		

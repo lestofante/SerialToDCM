@@ -1,11 +1,12 @@
 package myGame;
 
+import reader.SensorReader;
+import reader.audio.AudioReader;
 import myGame.GUI.GuiManager;
 import DCM.AcceControl;
 import DCM.DCMControl;
 import DCM.MagControl;
 import DCM.GyroControl;
-import Seriale.SerialReader;
 
 import com.jme3.app.SimpleApplication;
 import com.jme3.math.ColorRGBA;
@@ -43,9 +44,9 @@ public class Main extends SimpleApplication implements ScreenController {
 	
 	DCMlogic dcm = new DCMlogic();
 	
-	SerialReader serial = new SerialReader(dcm);
+	SensorReader sensorInput = new AudioReader(dcm);
 	
-	private Nifty				nifty;
+	private Nifty nifty;
 	
 	@Override
 	public void onEndScreen() {
@@ -91,7 +92,7 @@ public class Main extends SimpleApplication implements ScreenController {
 		
 		initializeGUI();
 		
-		serial.connect();
+		sensorInput.connect();
 		/**
 		Initialize GUI
 		final NiftyJmeDisplay niftyDisplay = new NiftyJmeDisplay(assetManager,
@@ -186,7 +187,7 @@ public class Main extends SimpleApplication implements ScreenController {
 	@Override
 	public void simpleUpdate(float tpf) {
 		super.simpleUpdate(tpf);
-		GuiManager.updateLabels(nifty,dcm.getAcc(),dcm.getGyro(),dcm.getMagn());
+		GuiManager.updateLabels(nifty,dcm.getAcc(),dcm.getSimpleGyro(),dcm.getMagn());
 	}
 	
 	@Override

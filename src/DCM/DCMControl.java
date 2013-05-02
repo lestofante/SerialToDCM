@@ -34,7 +34,7 @@ public class DCMControl extends AbstractControl {
 
 	@Override
 	protected void controlUpdate(float g0) {
-		/*
+		
 
 		Quaternion quat = dcm.getQuaternion();
 		//quat.t
@@ -43,7 +43,6 @@ public class DCMControl extends AbstractControl {
 		//System.out.println(quat);
 		getSpatial().setLocalRotation(new Quaternion(new float[]{-angles[2],angles[0],-angles[1]}));
 		
-		*/
 	}
 
 }

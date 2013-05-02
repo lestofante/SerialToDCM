@@ -12,7 +12,8 @@ public class DCMlogic {
 	float twoKpDef = (2.0f * 5f);
 	public float q0 = 1, q1 = 0, q2 = 0, q3 = 0;
 	float twoKp = twoKpDef;
-	float LSBtoRadiant = 1.99464953336f; //4.36332313 radiantper seconds
+	float LSBtoDegree = 114.285f;
+	float DegreetoRadiant = 0.0174532925f;
 	
 	Vector3f gyro=new Vector3f(), acc=new Vector3f(), magn=new Vector3f(), simpleGyro=new Vector3f();
 	
@@ -56,13 +57,19 @@ public class DCMlogic {
 			float _2q0mx, _2q0my, _2q0mz, _2q1mx, _2bx, _2bz, _4bx, _4bz, _2q0, _2q1, _2q2, _2q3, _2q0q2, _2q2q3, q0q0, q0q1, q0q2, q0q3, q1q1, q1q2, q1q3, q2q2, q2q3, q3q3;
 
 			
-			gx = gx / LSBtoRadiant;
-			gy = gy / LSBtoRadiant;
-			gz = gz / LSBtoRadiant;
+			gx = gx / LSBtoDegree;
+			gy = gy / LSBtoDegree;
+			gz = gz / LSBtoDegree;
+			
+			gx = gx * DegreetoRadiant;
+			gy = gy * DegreetoRadiant;
+			gz = gz * DegreetoRadiant;
 			
 			gyro = gyro.add( new Vector3f(gx, gy, gz).mult(1.0f/sampleFreq) );//lol, simple integration?
-			simpleGyro = new Vector3f(gx, gy, gz);
+			simpleGyro = new Vector3f(gx, gy, gz).mult(1.0f/sampleFreq);
 			//gyro = new Vector3f(gx, gy, gz).mult(1.0f/sampleFreq);
+			
+			//gx=gy=gz=0;//deactiuvate gyro!
 
 			acc = new Vector3f(ax, ay, az);
 
