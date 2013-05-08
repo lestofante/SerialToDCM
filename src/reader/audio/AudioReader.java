@@ -106,12 +106,13 @@ public class AudioReader extends SensorReader implements Runnable{
 			}
 		}
 	}
+	byte[] occorrenze = {'A', 'G', 'M', 'T'};
 	
 	private synchronized void analyze(byte[] read) {
 		
 		int findOccurence = 0;
 		while ( (findOccurence=findOccurence(read, findOccurence)) > -1){
-			System.out.println("findOccurence: "+findOccurence);
+			//System.out.println("findOccurence: "+findOccurence);
 			//read data
 			boolean validByte = true;
 			int i=findOccurence;
@@ -129,15 +130,17 @@ public class AudioReader extends SensorReader implements Runnable{
 				//System.out.println("byteLettiValidi: "+byteLettiValidi+" i: "+i+ " read lenght: "+read.length);
 				
 				if (i == findOccurence || i==findOccurence+1){
-					System.out.println("continuo: "+read[i]);
+					//System.out.println("continuo: "+read[i]);
 					i++;
 					continue;
 				}
 				
 				if (validByte){
-					System.out.println("valido: "+read[i]);
-					if (read[i]=='A' || read[i]=='G' || read[i]=='M')
-						validByte = false; //don't take care of next byte
+					//System.out.println("valido: "+read[i]);
+					for (int o=0; o<occorrenze.length; o++){
+						if ( read[i]==occorrenze[o] )
+							validByte = false; //don't take care of next byte
+					}
 					
 					switch(byteLettiValidi){
 					case 0:
@@ -160,7 +163,7 @@ public class AudioReader extends SensorReader implements Runnable{
 					case 5:
 						readLAbyte(read[i]);
 						lettura.z = val;
-						System.out.println("letto: "+lettura);
+						//System.out.println("letto: "+lettura);
 						break;
 					default:
 						System.out.println("grave errore byteLettiValidi "+byteLettiValidi);
@@ -186,6 +189,9 @@ public class AudioReader extends SensorReader implements Runnable{
 				case 'A':
 					accVec = lettura;
 					break;
+				case 'T':
+					System.out.println("test vect: "+lettura);
+					break;
 				default:
 					System.out.println("grave errore sensore "+sensore);
 				}
@@ -193,7 +199,7 @@ public class AudioReader extends SensorReader implements Runnable{
 			
 			if (gyroVec != null && accVec != null && magVec != null) {
 				if (stampaValori){
-					System.out.println("Gyro:"+gyroVec+" acc: "+accVec+" magne: "+magVec);
+					//System.out.println("Gyro:"+gyroVec+" acc: "+accVec+" magne: "+magVec);
 					stampaValori = false;
 				}
 				
@@ -218,8 +224,7 @@ public class AudioReader extends SensorReader implements Runnable{
 			*/
 		}
 	}
-
-	byte[] occorrenze = {'A', 'G', 'M'};
+	
 	private int findOccurence(byte[] read, int index) {
 		for (int i = index; i < read.length-1; i++) {
 			for (byte b:occorrenze){
@@ -228,7 +233,7 @@ public class AudioReader extends SensorReader implements Runnable{
 				}
 			}
 		}
-		System.out.println();
+		//System.out.println();
 		return -1;
 	}
 
