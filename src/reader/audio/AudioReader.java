@@ -126,6 +126,7 @@ public class AudioReader extends SensorReader implements Runnable{
 			int byteLettiValidi=0;
 			
 			Vector3f lettura= new Vector3f();
+			int ms, ls=0;
 			while (byteLettiValidi < 6 && i<read.length){
 				//System.out.println("byteLettiValidi: "+byteLettiValidi+" i: "+i+ " read lenght: "+read.length);
 				
@@ -141,27 +142,29 @@ public class AudioReader extends SensorReader implements Runnable{
 						if ( read[i]==occorrenze[o] )
 							validByte = false; //don't take care of next byte
 					}
-					
 					switch(byteLettiValidi){
 					case 0:
-						readMSbyte(read[i]);
+						ls = read[i] & 0xff;
 						break;
 					case 1:
-						readLAbyte(read[i]);
+						ms = read[i];
+						val=(ms<<8) | ls;
 						lettura.x = val;
 						break;
 					case 2:
-						readMSbyte(read[i]);
+						ls = read[i]& 0xff;
 						break;
 					case 3:
-						readLAbyte(read[i]);
+						ms = read[i];
+						val=(ms<<8) | ls;
 						lettura.y = val;
 						break;
 					case 4:
-						readMSbyte(read[i]);
+						ls = read[i]& 0xff;
 						break;
 					case 5:
-						readLAbyte(read[i]);
+						ms = read[i];
+						val= (ms<<8) | ls;
 						lettura.z = val;
 						//System.out.println("letto: "+lettura);
 						break;
@@ -190,7 +193,7 @@ public class AudioReader extends SensorReader implements Runnable{
 					accVec = lettura;
 					break;
 				case 'T':
-					System.out.println("test vect: "+lettura);
+					//System.out.println("test vect: "+lettura);
 					break;
 				default:
 					System.out.println("grave errore sensore "+sensore);
@@ -199,7 +202,7 @@ public class AudioReader extends SensorReader implements Runnable{
 			
 			if (gyroVec != null && accVec != null && magVec != null) {
 				if (stampaValori){
-					//System.out.println("Gyro:"+gyroVec+" acc: "+accVec+" magne: "+magVec);
+					System.out.println("Gyro:"+gyroVec+" acc: "+accVec+" magne: "+magVec);
 					stampaValori = false;
 				}
 				
@@ -236,7 +239,7 @@ public class AudioReader extends SensorReader implements Runnable{
 		//System.out.println();
 		return -1;
 	}
-
+/*
 	private void readLAbyte(byte tmp) {
 		// copia in val i byte ad uno del byte meno significativo, completando
 		// così il dato (or logico, per evitare casini con i signed/unsigned se
@@ -249,7 +252,7 @@ public class AudioReader extends SensorReader implements Runnable{
 		val = tmp;//keep the sign!
 		val = val << 8;
 	}
-
+*/
 	@Override
 	public void connect() {
 		new Thread(this).start();
