@@ -108,202 +108,124 @@ public class AudioReader extends SensorReader implements Runnable{
 	}
 	
 	private synchronized void analyze(byte[] read) {
-		if (offset == -1) {
-			//System.out.println("Analizing: " + read.length);
-			// we don't know where we are on the stream. find occurence of "A",
-			// "G" and "M" to find it
-			int index = findOccurence(read, 0);
-			//System.out.println("Index: " + index);
-			int tmpIndex = index;
-			boolean ok = true;
-			if (tmpIndex < 0) {
-				ok = false;
-			}
-			while (tmpIndex >= 0 && tmpIndex < read.length) {
-				System.out.println("check index is looking at " + tmpIndex);
-				if (!(read[tmpIndex] == 'A') && !(read[tmpIndex] == 'G') && !(read[tmpIndex] == 'M')) {
-					System.out.println("Continuity error on index: " + tmpIndex + " is: " + read[tmpIndex] + " len is: " + read.length);
-					try {
-						System.out.println("Checked string is: " + new String(read, "ASCII"));
-					} catch (UnsupportedEncodingException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					ok = false;
-					break;
-				}
-				tmpIndex += 7;
-			}
-			if (ok == true) {
-				System.out.println("Setting index: " + index);
-				offset = -index;
-				analyze(read);
+		
+		int findOccurence = 0;
+		while ( (findOccurence=findOccurence(read, findOccurence)) > -1){
+			System.out.println("findOccurence: "+findOccurence);
+			//read data
+			boolean validByte = true;
+			int i=findOccurence;
+			char sensore = (char) read[i];
+			
+			if (sensore == 'b'){
+				//fine del pacchetto!!
 				return;
 			}
-		} else {
-			for (int i = 0; i < read.length; i++) {
-				//System.out.println("leggo dati offeset: "+offset+" i: "+i+" di: "+read.length+" valore: "+read[i]);
-				switch (offset) {
-				case 0:
-					tipoSensore = read[i];
-					switch (tipoSensore) {
-					case 'G':
-						// selezionato = writerGyro;
-						choosen = 1;
+			
+			int byteLettiValidi=0;
+			
+			Vector3f lettura= new Vector3f();
+			while (byteLettiValidi < 6 && i<read.length){
+				//System.out.println("byteLettiValidi: "+byteLettiValidi+" i: "+i+ " read lenght: "+read.length);
+				
+				if (i == findOccurence || i==findOccurence+1){
+					System.out.println("continuo: "+read[i]);
+					i++;
+					continue;
+				}
+				
+				if (validByte){
+					System.out.println("valido: "+read[i]);
+					if (read[i]=='A' || read[i]=='G' || read[i]=='M')
+						validByte = false; //don't take care of next byte
+					
+					switch(byteLettiValidi){
+					case 0:
+						readMSbyte(read[i]);
 						break;
-					case 'A':
-						// selezionato = writerAcce;
-						choosen = 2;
+					case 1:
+						readLAbyte(read[i]);
+						lettura.x = val;
 						break;
-					case 'M':
-						// selezionato = writerAcce;
-						choosen = 3;
+					case 2:
+						readMSbyte(read[i]);
+						break;
+					case 3:
+						readLAbyte(read[i]);
+						lettura.y = val;
+						break;
+					case 4:
+						readMSbyte(read[i]);
+						break;
+					case 5:
+						readLAbyte(read[i]);
+						lettura.z = val;
+						System.out.println("letto: "+lettura);
 						break;
 					default:
-						choosen = 0;
-						// selezionato = null;
-						System.out.println("BHO!: " + tipoSensore);
-						offset = -2;
-						// System.out.println("Index errato, ritento");
-						i = read.length;// force exit
-						break;
+						System.out.println("grave errore byteLettiValidi "+byteLettiValidi);
 					}
-					offset++;
+					byteLettiValidi++;
+				}else{
+					validByte = true;
+					//System.out.println("non valido");
+				}
+				i++;
+			}
+			
+			findOccurence+=2; // don't elaborate this sub packet again
+			
+			if (byteLettiValidi == 6){
+				switch(sensore){
+				case 'G':
+					gyroVec = lettura;
 					break;
-				case 1:// MS x
-					val=0;
-					readMSbyte(read[i]);
-					offset++;
+				case 'M':
+					magVec = lettura;
 					break;
-				case 2:// LS x
-					readLAbyte(read[i]);
-					temp.x = val;
-					// if(choosen!=null)
-					// if(choosen.equals(gyroQueue))
-					// temp.x += 26;
-					// selezionato.print(val + " ");
-					offset++;
-					break;
-				case 3:// MS y
-					val=0;
-					readMSbyte(read[i]);
-					offset++;
-					break;
-				case 4:// LS y
-					readLAbyte(read[i]);
-					temp.y = val;
-					// if(choosen!=null)
-					// if(choosen.equals(gyroQueue))
-					// temp.y += 7;
-					// selezionato.print(val + " ");
-					offset++;
-					break;
-				case 5:// MS z
-					val=0;
-					readMSbyte(read[i]);
-					offset++;
-					break;
-				case 6:// MS z
-					readLAbyte(read[i]);
-					temp.z = val;
-					if (choosen != 0) {
-
-						// float swap;
-
-						if (choosen == 1) {
-							
-							// now output register are x, y, x, and we translate them relative to gyro
-							/*
-							float swap = temp.x;
-							temp.x = temp.y;
-							temp.y = swap;
-							
-							temp.x = -temp.x;
-							temp.y = -temp.y;
-							*/
-							
-							//output register are x, y, z, and are aligned as our referencew system
-							gyroVec = temp;
-							//System.out.println("gyro: " + temp);
-						}
-
-						if (choosen == 2) {// ACC
-							
-							//output register are x, y, z, and we translate them relative to gyro
-							/*
-							float swap = temp.z;
-							temp.z = temp.y;
-							temp.y = swap;
-							*/
-							//temp.y = -temp.y;
-							//temp.x = -temp.x;
-							//temp.z = -temp.z;
-							//System.out.println("Acc: " + temp);
-							accVec = temp;
-						}
-
-						if (choosen == 3) {
-							//output register are x, Z, Y, and we translate them relative to gyro
-							/*
-							float swap = temp.x;
-							temp.x = temp.y;
-							temp.y = swap;
-							*/
-							
-							//temp.y = -temp.y;
-							//temp.x = -temp.x;
-							//System.out.println("Magne: " + temp);
-							magVec = temp;
-						}
-						choosen = 0;
-						temp = new Vector3f();
-					}
-					offset = 0;
+				case 'A':
+					accVec = lettura;
 					break;
 				default:
-					offset++;
-				}
-				// magVec=null;
-
-				if (gyroVec != null && accVec != null && magVec != null) {
-					if (stampaValori){
-						System.out.println("Gyro:"+gyroVec+" acc: "+accVec+" magne: "+magVec);
-						stampaValori = false;
-					}
-					
-					if (dcm != null) {
-						dcm.MadgwickAHRSupdate(gyroVec.x, gyroVec.y, gyroVec.z,
-								accVec.x, accVec.y, accVec.z, magVec.x,
-								magVec.y, magVec.z);
-					}
-					gyroVec = accVec = magVec = null;
-					choosen = 0;
-				} 
-				if (gyroVec != null && accVec != null) {
-					if (stampaValori){
-						System.out.println("Gyro:"+gyroVec+" acc: "+accVec);
-						stampaValori = false;
-					}
-					dcm.MadgwickAHRSupdate(gyroVec.x, gyroVec.y, gyroVec.z, accVec.x, accVec.y, accVec.z, 0, 0, 0);
-					gyroVec = accVec = null;
-					choosen = 0;
+					System.out.println("grave errore sensore "+sensore);
 				}
 			}
+			
+			if (gyroVec != null && accVec != null && magVec != null) {
+				if (stampaValori){
+					System.out.println("Gyro:"+gyroVec+" acc: "+accVec+" magne: "+magVec);
+					stampaValori = false;
+				}
+				
+				if (dcm != null) {
+					dcm.MadgwickAHRSupdate(gyroVec.x, gyroVec.y, gyroVec.z,
+							accVec.x, accVec.y, accVec.z, magVec.x,
+							magVec.y, magVec.z);
+				}
+				gyroVec = accVec = magVec = null;
+				choosen = 0;
+			}
+			/*
+			if (gyroVec != null && accVec != null) {
+				if (stampaValori){
+					System.out.println("Gyro:"+gyroVec+" acc: "+accVec);
+					stampaValori = false;
+				}
+				dcm.MadgwickAHRSupdate(gyroVec.x, gyroVec.y, gyroVec.z, accVec.x, accVec.y, accVec.z, 0, 0, 0);
+				gyroVec = accVec = null;
+				choosen = 0;
+			}
+			*/
 		}
-
 	}
 
+	byte[] occorrenze = {'A', 'G', 'M'};
 	private int findOccurence(byte[] read, int index) {
-		for (int i = index; i < read.length; i++) {
-			System.out.print(read[i] + " ");
-			if (read[i] == 'A' || read[i] == 'G' || read[i] == 'M') {
-				return i - index;
-			}
-			if (read[i] == 65 || read[i] == 71 || read[i] == 77) {
-				System.out.println("Alternative find ok"); // charset problem?
-															// maybe 16bit vs 8
-															// bit?
-				return i - index;
+		for (int i = index; i < read.length-1; i++) {
+			for (byte b:occorrenze){
+				if (read[i] == b && read[i+1] == b) {
+					return i;
+				}
 			}
 		}
 		System.out.println();
