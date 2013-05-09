@@ -21,13 +21,14 @@ public class AudioReader extends SensorReader implements Runnable{
 	private Vector3f gyroVec;
 	private Vector3f accVec;
 	private Vector3f magVec;
+	private Vector3f testVec;
 	boolean stampaValori = false;
 	public final AtomicBoolean leggi = new AtomicBoolean(true);
 
 	int lettureValide=0;
 	
 	//da concordare con la scheda
-	byte[] occorrenze = {'A', 'G', 'M', 'T'};// Accelerometer, Gyroscope, Magnetometer, Test
+	byte[] occorrenze = {'A', 'G', 'M', 'T', 'S'};// Accelerometer, Gyroscope, Magnetometer, Test, countMilliseconds
 	
 	@Override
 	public void run() {
@@ -90,6 +91,11 @@ public class AudioReader extends SensorReader implements Runnable{
 			deltaT = System.currentTimeMillis()-tempo; 
 			if (deltaT > 1000){
 				System.out.println( "letture valide al secondo:"+lettureValide/(deltaT/1000.0)+" byte al secondo: " + sum/(deltaT/1000.0)+" min: "+min+" max: "+max );
+				System.out.println( "letture differenti al secondo: giro "+diffGyro+" acc "+diffAcc+" magne "+diffMagne+" test "+diffTest+" millisec "+diffMs );
+				
+				//test some data integrity
+				diffGyro=diffAcc=diffMagne=diffTest=diffMs=0;
+				
 				sum =0;
 				lettureValide = 0;
 				
@@ -195,6 +201,12 @@ public class AudioReader extends SensorReader implements Runnable{
 					accVec = lettura;
 					break;
 				case 'T':
+					testVec = lettura;
+					diffTest++;
+					//System.out.println("test vect: "+lettura);
+					break;
+				case 'S':
+					diffMs++;
 					//System.out.println("test vect: "+lettura);
 					break;
 				default:
@@ -204,7 +216,7 @@ public class AudioReader extends SensorReader implements Runnable{
 			
 			if (gyroVec != null && accVec != null && magVec != null) {
 				if (stampaValori){
-					System.out.println("Gyro:"+gyroVec+" acc: "+accVec+" magne: "+magVec);
+					System.out.println("Gyro:"+gyroVec+" acc: "+accVec+" magne: "+magVec+" test: "+testVec);
 					stampaValori = false;
 				}
 				
@@ -213,7 +225,9 @@ public class AudioReader extends SensorReader implements Runnable{
 							accVec.x, accVec.y, accVec.z, magVec.x,
 							magVec.y, magVec.z);
 				}
+				calibra(gyroVec, accVec, magVec);
 				gyroVec = accVec = magVec = null;
+				
 			}
 			/*
 			if (gyroVec != null && accVec != null) {
@@ -221,13 +235,64 @@ public class AudioReader extends SensorReader implements Runnable{
 					System.out.println("Gyro:"+gyroVec+" acc: "+accVec);
 					stampaValori = false;
 				}
-				dcm.MadgwickAHRSupdate(gyroVec.x, gyroVec.y, gyroVec.z, accVec.x, accVec.y, accVec.z, 0, 0, 0);
+				
+				if (dcm != null) {
+					dcm.MadgwickAHRSupdate(gyroVec.x, gyroVec.y, gyroVec.z, 
+							accVec.x, accVec.y, accVec.z, 
+							0, 0, 0);
+				}
 				gyroVec = accVec = null;
 			}
 			*/
 		}
 	}
 	
+	Vector3f lastGyro = null, lastAcc=null, lastMag = null;
+	private float SOGLIA_GYRO = 1000;
+	private int diffGyro = 0, diffAcc = 0, diffMagne = 0, diffTest=0, diffMs=0;
+	private void calibra(Vector3f gyroVec, Vector3f accVec, Vector3f magVec) {
+		if (lastGyro==null || lastAcc==null || lastMag==null){
+			lastAcc = accVec;
+			lastGyro = gyroVec;
+			lastMag = magVec;
+			return;
+		}
+		
+		if (!gyroVec.equals(lastGyro)){
+			diffGyro++;
+		}
+		/*
+		testSoglia(gyroVec.x, lastGyro.x, SOGLIA_GYRO, "GyroX");
+		testSoglia(gyroVec.y, lastGyro.y, SOGLIA_GYRO, "GyroY");
+		testSoglia(gyroVec.z, lastGyro.z, SOGLIA_GYRO, "GyroZ");
+		*/
+		if (!accVec.equals(lastAcc)){
+			diffAcc++;
+		}
+		
+		testSoglia(accVec.x, lastAcc.x, SOGLIA_GYRO, "AccX");
+		testSoglia(accVec.y, lastAcc.y, SOGLIA_GYRO, "AccY");
+		testSoglia(accVec.z, lastAcc.z, SOGLIA_GYRO, "AccZ");
+		
+		if (!magVec.equals(lastMag)){
+			diffMagne++;
+		}
+		
+		testSoglia(magVec.x, lastMag.x, SOGLIA_GYRO, "MagX");
+		testSoglia(magVec.y, lastMag.y, SOGLIA_GYRO, "MagY");
+		testSoglia(magVec.z, lastMag.z, SOGLIA_GYRO, "MagZ");
+		
+		lastAcc = accVec;
+		lastGyro = gyroVec;
+		lastMag = magVec;
+	}
+	
+	private void testSoglia(float a, float b, float soglia, String nome){
+		if ( Math.abs(a - b) > soglia  ){
+			System.out.println( nome+" diff: "+(a - b) );
+		}
+	}
+
 	private int findOccurence(byte[] read, int index) {
 		for (int i = index; i < read.length-1; i++) {
 			for (byte b:occorrenze){
