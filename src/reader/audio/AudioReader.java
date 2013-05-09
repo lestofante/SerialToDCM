@@ -29,6 +29,7 @@ public class AudioReader extends SensorReader implements Runnable{
 	
 	//da concordare con la scheda
 	byte[] occorrenze = {'A', 'G', 'M', 'T', 'S'};// Accelerometer, Gyroscope, Magnetometer, Test, countMilliseconds
+	private int countGyro=0, countMag=0,countAcc=0;
 	
 	@Override
 	public void run() {
@@ -91,10 +92,12 @@ public class AudioReader extends SensorReader implements Runnable{
 			deltaT = System.currentTimeMillis()-tempo; 
 			if (deltaT > 1000){
 				System.out.println( "letture valide al secondo:"+lettureValide/(deltaT/1000.0)+" byte al secondo: " + sum/(deltaT/1000.0)+" min: "+min+" max: "+max );
+				System.out.println( "letture al secondo: giro "+countGyro+" acc "+countMag+" magne "+countMag );
 				System.out.println( "letture differenti al secondo: giro "+diffGyro+" acc "+diffAcc+" magne "+diffMagne+" test "+diffTest+" millisec "+diffMs );
 				
 				//test some data integrity
 				diffGyro=diffAcc=diffMagne=diffTest=diffMs=0;
+				countGyro=countMag=countAcc=0;
 				
 				sum =0;
 				lettureValide = 0;
@@ -193,12 +196,15 @@ public class AudioReader extends SensorReader implements Runnable{
 				switch(sensore){
 				case 'G':
 					gyroVec = lettura;
+					countGyro++;
 					break;
 				case 'M':
 					magVec = lettura;
+					countMag++;
 					break;
 				case 'A':
 					accVec = lettura;
+					countAcc++;
 					break;
 				case 'T':
 					testVec = lettura;
