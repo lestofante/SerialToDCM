@@ -92,7 +92,7 @@ public class AudioReader extends SensorReader implements Runnable{
 			deltaT = System.currentTimeMillis()-tempo; 
 			if (deltaT > 1000){
 				System.out.println( "letture valide al secondo:"+lettureValide/(deltaT/1000.0)+" byte al secondo: " + sum/(deltaT/1000.0)+" min: "+min+" max: "+max );
-				System.out.println( "letture al secondo: giro "+countGyro+" acc "+countMag+" magne "+countMag );
+				System.out.println( "letture al secondo: giro "+countGyro+" acc "+countAcc+" magne "+countMag );
 				System.out.println( "letture differenti al secondo: giro "+diffGyro+" acc "+diffAcc+" magne "+diffMagne+" test "+diffTest+" millisec "+diffMs );
 				
 				//test some data integrity
