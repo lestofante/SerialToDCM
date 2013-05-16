@@ -267,11 +267,11 @@ public class AudioReader extends SensorReader implements Runnable{
 		if (!gyroVec.equals(lastGyro)){
 			diffGyro++;
 		}
-		/*
+		
 		testSoglia(gyroVec.x, lastGyro.x, SOGLIA_GYRO, "GyroX");
 		testSoglia(gyroVec.y, lastGyro.y, SOGLIA_GYRO, "GyroY");
 		testSoglia(gyroVec.z, lastGyro.z, SOGLIA_GYRO, "GyroZ");
-		*/
+		
 		if (!accVec.equals(lastAcc)){
 			diffAcc++;
 		}
@@ -295,7 +295,8 @@ public class AudioReader extends SensorReader implements Runnable{
 	
 	private void testSoglia(float a, float b, float soglia, String nome){
 		if ( Math.abs(a - b) > soglia  ){
-			System.out.println( nome+" diff: "+(a - b) );
+			boolean zero = false;
+			System.out.println( nome+"\tdiff: "+(a - b)+"\ta:"+a+"\tb:"+b );
 		}
 	}
 
