@@ -79,14 +79,14 @@ public class AudioReader extends SensorReader implements Runnable{
 		long tempo = System.currentTimeMillis();
 		long deltaT, min=Integer.MAX_VALUE, max = Integer.MIN_VALUE;
 		while( leggi.get() ){
-			System.out.println("Leggo dati");
+			//System.out.println("Leggo dati");
 			read = microphone.read(buffer, 0, buffer.length ); //we must read 2 byte at time
-			System.out.println("letti");
+			//System.out.println("letti");
 			sum+=read;
 			//readok=0;
-			System.out.println("analizzo");
+			//System.out.println("analizzo");
 			analyze(buffer);
-			System.out.println("analizzati");
+			//System.out.println("analizzati");
 			
 			if (min > read){
 				min = read;
@@ -290,7 +290,7 @@ public class AudioReader extends SensorReader implements Runnable{
 				case 'T':
 					testVec = lettura;
 					diffTest++;
-					//System.out.println("test vect: "+lettura);
+					System.out.println("test vect: "+lettura);
 					break;
 				case 'S':
 					testVec = lettura;
@@ -345,7 +345,7 @@ public class AudioReader extends SensorReader implements Runnable{
 							0, 0, 1, 
 							0, 0, 0);
 				}
-				calibra(gyroVec, new Vector3f(), new Vector3f());
+				//calibra(gyroVec, new Vector3f(), new Vector3f());
 				gyroVec = null;
 			}
 			
@@ -389,7 +389,7 @@ public class AudioReader extends SensorReader implements Runnable{
 			System.out.println("ko "+val+" read ok was "+readok);
 			readok=0;
 		}else{
-			System.out.println("ok "+val);
+			//System.out.println("ok "+val);
 			readok++;
 		}
 		return val;
