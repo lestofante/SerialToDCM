@@ -32,6 +32,7 @@ public class AudioReader extends SensorReader implements Runnable{
 	//da concordare con la scheda
 	byte[] occorrenze = {'A', 'G', 'M', 'T', 'S'};// Accelerometer, Gyroscope, Magnetometer, Test, countMilliseconds
 	private int countGyro=0, countMag=0,countAcc=0;
+	private long lastMilliS;
 	
 	@Override
 	public void run() {
@@ -201,8 +202,8 @@ public class AudioReader extends SensorReader implements Runnable{
 							System.out.println("ms: "+toBinary(ms) );
 
 						val = 0;
-						val = concatenate1(ms, ls);
-						concatenate2(ms, ls);
+						val = concatenate1(read[i-1], read[i]);
+						//concatenate2(ms, ls);
 						
 						lettura.x = val;
 						
@@ -227,8 +228,8 @@ public class AudioReader extends SensorReader implements Runnable{
 							System.out.println("ms: "+toBinary(ms) );
 						
 						val = 0;
-						val = concatenate1(ms, ls);
-						concatenate2(ms, ls);
+						val = concatenate1(read[i-1], read[i]);
+						//concatenate2(ms, ls);
 						
 						lettura.y = val;
 						
@@ -252,8 +253,8 @@ public class AudioReader extends SensorReader implements Runnable{
 							System.out.println("ms: "+toBinary(ms) );
 						
 						val = 0;
-						val = concatenate1(ms, ls);
-						concatenate2(ms, ls);
+						val = concatenate1(read[i-1], read[i]);
+						//concatenate2(ms, ls);
 						
 						lettura.z = val;
 						
@@ -290,12 +291,13 @@ public class AudioReader extends SensorReader implements Runnable{
 				case 'T':
 					testVec = lettura;
 					diffTest++;
-					System.out.println("test vect: "+lettura);
+					//System.out.println("test vect: "+lettura);
 					break;
 				case 'S':
 					testVec = lettura;
 					diffMs++;
-					//System.out.println("test vect: "+lettura);
+					System.out.println("S RICEVUTA, TEMPO : "+(System.currentTimeMillis()-lastMilliS) );
+					lastMilliS = System.currentTimeMillis();
 					break;
 				default:
 					System.out.println("grave errore sensore "+sensore);
@@ -351,7 +353,19 @@ public class AudioReader extends SensorReader implements Runnable{
 			
 		}
 	}
-	
+	private short concatenate1(byte ms, byte ls) {
+		//ls = ms = -1;
+		//toBinary(ls);
+		//toBinary(ms);
+		short ris = (short) ((ms << 8) | ls); 
+		//System.out.println("valore "+ris);
+		//toBinary(ris);
+		
+		//if (ris!=0)
+		//	System.out.println("valore erratico: "+ris);
+		return ris;
+	}
+	/*
 	private short concatenate2(int ms, int ls) {
 		short val=0;
 		val|=(ls<<8) | ms;
@@ -366,6 +380,7 @@ public class AudioReader extends SensorReader implements Runnable{
 			if (Math.abs(val) > SOGLIA_GYRO)
 				System.out.println("sfaso4");
 		}
+		
 		return val;
 	}
 
@@ -385,25 +400,21 @@ public class AudioReader extends SensorReader implements Runnable{
 				System.out.println("sfaso2");
 		}
 		
-		if (Math.abs(val) > SOGLIA_GYRO){
-			System.out.println("ko "+val+" read ok was "+readok);
-			readok=0;
-		}else{
-			//System.out.println("ok "+val);
-			readok++;
-		}
 		return val;
 	}
-
+	 */
+	private static final int bitReverse = 16;
+	
 	private String toBinary(int b) {
-		for (int i=0; i< bitReverse; i++){
+		for (int i=bitReverse; i>=0 ; i--){
 			System.out.print( (b&(1<<i))!=0?'1':'0');
 		}
-		System.out.print(" ");
+		System.out.println();
 		return b+"";
 	}
 	
-	private static final int bitReverse = 16;
+	/*
+	
 	private short reverse(short x) {
 		short b=0;
 		boolean temp;
@@ -413,13 +424,7 @@ public class AudioReader extends SensorReader implements Runnable{
 				b |= 1<<(bitReverse-1-i);
 			}
 		}
-		/*
-		while ( (x & 0xff) != 0){
-			b<<=1;
-			b|=( x &1);
-			x>>=1;
-		}
-		*/
+		
 		if (debugByte){
 			System.out.print("was: ");
 			for (int i=0; i< bitReverse; i++){
@@ -435,10 +440,11 @@ public class AudioReader extends SensorReader implements Runnable{
 		}
 		return b;
 	}
-	
+	*/
 	Vector3f lastGyro = null, lastAcc=null, lastMag = null;
 	private float SOGLIA_GYRO = 2000;
 	private int diffGyro = 0, diffAcc = 0, diffMagne = 0, diffTest=0, diffMs=0;
+	/*
 	private void calibra(Vector3f gyroVec, Vector3f accVec, Vector3f magVec) {
 		if (lastGyro==null || lastAcc==null || lastMag==null){
 			lastAcc = accVec;
@@ -494,7 +500,7 @@ public class AudioReader extends SensorReader implements Runnable{
 			System.out.println();
 		}
 	}
-
+	 */
 	private int findOccurence(byte[] read, int index) {
 		for (int i = index; i < read.length-1; i++) {
 			for (byte b:occorrenze){
