@@ -4,7 +4,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Line;
 import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.Mixer;
 import javax.sound.sampled.Mixer.Info;
 import javax.sound.sampled.TargetDataLine;
 
@@ -44,15 +46,25 @@ public class AudioReader extends SensorReader implements Runnable{
 			Info choosen = null;
 			for (Info i:AudioSystem.getMixerInfo()){
 				System.out.println(i.getName());
-				if (i.getName().contains("Joystick") && i.getName().contains("plughw")){
+				if (i.getName().contains("Joystick")){
 					choosen = i;
 					System.out.println(i.getName()+" THIS HAS BEEN CHOOSED");
-					break;
 				}
 			}
 			
-			if (choosen!=null)
+			if (choosen!=null){
+				System.out.println(choosen.getDescription());
+				Mixer m = AudioSystem.getMixer(choosen);
+				m.open();
+				
+				  Line.Info[] lineInfos = m.getSourceLineInfo();
+				  for (Line.Info lineInfo:lineInfos){
+				   System.out.println (choosen.getName()+"---"+lineInfo);
+				   Line line = m.getLine(lineInfo);
+				   System.out.println("\t-----"+line);
+				  }
 				microphone = AudioSystem.getTargetDataLine(format, choosen);
+			}
 			else{
 				System.err.println("Scheda STM32f3 non trovata");
 				return;

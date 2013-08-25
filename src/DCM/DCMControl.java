@@ -41,7 +41,7 @@ public class DCMControl extends AbstractControl {
 		float angles[] = quat.toAngles(null); //yaw,roll,pitch
 		
 		//System.out.println(quat);
-		getSpatial().setLocalRotation(new Quaternion(new float[]{-angles[2],angles[0],-angles[1]}));
+		getSpatial().setLocalRotation(quat);
 		
 	}
 

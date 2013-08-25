@@ -1,6 +1,7 @@
 package myGame;
 
 import reader.SensorReader;
+import reader.USB.USBReader;
 import reader.audio.AudioReader;
 import myGame.GUI.GuiManager;
 import DCM.AcceControl;
@@ -44,7 +45,7 @@ public class Main extends SimpleApplication implements ScreenController {
 	
 	DCMlogic dcm = new DCMlogic();
 	
-	SensorReader sensorInput = new AudioReader(dcm);
+	SensorReader sensorInput = new USBReader(dcm);
 	
 	private Nifty nifty;
 	

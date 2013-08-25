@@ -34,5 +34,6 @@
 	<classpathentry kind="lib" path="/usr/share/java/jme/lib/vecmath.jar"/>
 	<classpathentry kind="lib" path="/usr/share/java/jme/lib/xmlpull-xpp3.jar"/>
 	<classpathentry kind="lib" path="RXTXcomm.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/USBTest"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
