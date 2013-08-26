@@ -10,6 +10,7 @@ import com.jme3.renderer.ViewPort;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.control.AbstractControl;
 import com.jme3.scene.control.Control;
+import com.jme3.util.TempVars;
 
 public class GyroControl extends AbstractControl {
 
@@ -33,10 +34,11 @@ public class GyroControl extends AbstractControl {
 	}
 
 	@Override
-	protected void controlUpdate(float g0) {		
+	protected void controlUpdate(float g0) {	
 		Vector3f vec = dcm.getSimpleGyro();		
-		Quaternion q = new Quaternion(new float[]{vec.x,vec.z,vec.y}); 
-		getSpatial().setLocalRotation(q);
+		TempVars vars = TempVars.get();
+		Quaternion q = new Quaternion(new float[]{vec.y,vec.z,vec.x}); 
+		getSpatial().rotate(vec.y,vec.z,vec.x);
 	}
 
 }

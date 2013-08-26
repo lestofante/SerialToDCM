@@ -9,7 +9,7 @@ public class DCMlogic {
 	private final Object sincronizzaUpdate = new Object();
 
 	float sampleFreq = 100;
-	float twoKpDef = (2.0f * 0.5f);
+	float twoKpDef = (2.0f * 5f);
 	public float q0 = 1, q1 = 0, q2 = 0, q3 = 0;
 	float twoKp = twoKpDef;
 	private float twoKi = 2.0f * 0.01f;
@@ -18,7 +18,7 @@ public class DCMlogic {
 
 
 	//long lastUp = System.nanoTime();
-	long count=-1, lastFreqUp=System.currentTimeMillis();
+	long count=-1, lastFreqUp=System.nanoTime();
 
 	private float	qPred1;
 
@@ -34,11 +34,22 @@ public class DCMlogic {
 	private float integralFBy;
 
 	private float integralFBz;
+	
 	public void FreeIMUUpdate(float gx, float gy, float gz, float ax, float ay, float az, float mx, float my, float mz){
+		if (count == -1){ //just the first time!
+			lastFreqUp = System.nanoTime();
+		}
+		count ++;
+		if (System.nanoTime()-lastFreqUp>=1000000000){
+			//System.out.println("Frequenza: "+count );
+			sampleFreq = count;
+			count=0;
+			lastFreqUp = System.nanoTime();
+		}
 		gyro = gyro.add( new Vector3f(gx, gy, gz).mult(1.0f/sampleFreq) );//lol, simple integration?
 		simpleGyro = new Vector3f(gx, gy, gz).mult(1.0f/sampleFreq);
 
-		acc = new Vector3f(ax, ay, az);
+		acc = new Vector3f(ax, -az, ay);
 
 		magn = new Vector3f(mx, my, mz);
 
@@ -108,8 +119,8 @@ public class DCMlogic {
 			halfey += (az * halfvx - ax * halfvz);
 			halfez += (ax * halfvy - ay * halfvx);
 			
-			System.out.println("HalfV|"+"halfvx: "+halfvx+" halfvy: "+halfvy+" halfvz: "+halfvz);
-			System.out.println("Halferr|"+"halfex: "+halfex+" halfey: "+halfey+" halfez: "+halfez);
+			//System.out.println("HalfV|"+"halfvx: "+halfvx+" halfvy: "+halfvy+" halfvz: "+halfvz);
+			//System.out.println("Halferr|"+"halfex: "+halfex+" halfey: "+halfey+" halfez: "+halfez);
 		}
 
 		// Apply feedback only when valid data has been gathered from the accelerometer or magnetometer
@@ -122,7 +133,7 @@ public class DCMlogic {
 				gx += integralFBx;  // apply integral feedback
 				gy += integralFBy;
 				gz += integralFBz;
-				System.out.println("Integrating!");
+				//System.out.println("Integrating!");
 			}
 			else {
 				integralFBx = 0.0f; // prevent integral windup
@@ -154,6 +165,12 @@ public class DCMlogic {
 		q1 *= recipNorm;
 		q2 *= recipNorm;
 		q3 *= recipNorm;
+		
+		System.out.write(Float.floatToIntBits(q0));
+		System.out.write(Float.floatToIntBits(q1));
+		System.out.write(Float.floatToIntBits(q2));
+		System.out.write(Float.floatToIntBits(q3));
+		System.out.println();
 	}
 	
 	public void MadgwickAHRSupdate(float gx, float gy, float gz, float ax, float ay, float az, float mx, float my, float mz) {
@@ -406,8 +423,8 @@ public class DCMlogic {
 			qDot3 -= twoKp * s2;
 			qDot4 -= twoKp * s3;			
 
-			System.out.println("After|"+"s1: "+s1+" s2: "+s2+" s3: "+s3);
-			System.out.println("qDot1: "+qDot1+" qDot2: "+qDot2+" qDot3: "+qDot3+" qDot4: "+qDot4);
+			//System.out.println("After|"+"s1: "+s1+" s2: "+s2+" s3: "+s3);
+			//System.out.println("qDot1: "+qDot1+" qDot2: "+qDot2+" qDot3: "+qDot3+" qDot4: "+qDot4);
 		}
 
 		// Integrate rate of change of quaternion to yield quaternion
@@ -423,7 +440,7 @@ public class DCMlogic {
 		q2 *= recipNorm;
 		q3 *= recipNorm;
 
-		System.out.println("q0: "+q0+" q1: "+q1+" q2: "+q2+" q3: "+q3);
+		//System.out.println("q0: "+q0+" q1: "+q1+" q2: "+q2+" q3: "+q3);
 	}
 
 	// ---------------------------------------------------------------------------------------------------

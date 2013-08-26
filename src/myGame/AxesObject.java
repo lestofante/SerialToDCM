@@ -8,7 +8,7 @@ import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.shape.Box;
 
-public class AxesObject {
+public class AxesObject implements GeometryProvider{
 	
 	private Node createGeometry(AssetManager assetManager) {
 		
@@ -48,6 +48,7 @@ public class AxesObject {
 		geometry = createGeometry(assetManager);
 	}
 
+	@Override
 	public Node getGeometry() {
 		return geometry;
 	}

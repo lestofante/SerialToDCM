@@ -38,16 +38,17 @@ public class Main extends SimpleApplication implements ScreenController {
 	Node rootNode3 = new Node();
 	Node rootNode4 = new Node();
 
-	AxesObject obj1;
-	AxesObject obj2;
-	AxesObject obj3;
-	AxesObject obj4;
+	GeometryProvider obj1;
+	GeometryProvider obj2;
+	GeometryProvider obj3;
+	GeometryProvider obj4;
 	
 	DCMlogic dcm = new DCMlogic();
 	
 	SensorReader sensorInput = new USBReader(dcm);
 	
 	private Nifty nifty;
+	private long lastLabelUpdate;
 	
 	@Override
 	public void onEndScreen() {
@@ -188,7 +189,10 @@ public class Main extends SimpleApplication implements ScreenController {
 	@Override
 	public void simpleUpdate(float tpf) {
 		super.simpleUpdate(tpf);
-		GuiManager.updateLabels(nifty,dcm.getAcc(),dcm.getSimpleGyro(),dcm.getMagn());
+		if(System.nanoTime()-lastLabelUpdate>1000000000){
+			GuiManager.updateLabels(nifty,dcm.getAcc(),dcm.getSimpleGyro(),dcm.getMagn());
+			lastLabelUpdate = System.nanoTime();
+		}
 	}
 	
 	@Override
