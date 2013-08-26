@@ -154,6 +154,12 @@ public class DCMlogic {
 		q1 *= recipNorm;
 		q2 *= recipNorm;
 		q3 *= recipNorm;
+		
+		System.out.print(q0+" ");
+		System.out.print(q1+" ");
+		System.out.print(q2+" ");
+		System.out.print(q3+" ");
+		System.out.println();
 	}
 	
 	public void MadgwickAHRSupdate(float gx, float gy, float gz, float ax, float ay, float az, float mx, float my, float mz) {
