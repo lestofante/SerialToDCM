@@ -95,11 +95,27 @@ public class DCMlogic {
 			halfwx = bx * (0.5f - q2q2 - q3q3) + bz * (q1q3 - q0q2);
 			halfwy = bx * (q1q2 - q0q3) + bz * (q0q1 + q2q3);
 			halfwz = bx * (q0q2 + q1q3) + bz * (0.5f - q1q1 - q2q2);
-
+			
+			float norm = invSqrt(halfwx*halfwx+halfwy*halfwy+halfwz*halfwz);
+			halfwx*=norm;
+			halfwy*=norm;
+			halfwz*=norm;
+			/*
+			System.out.println("Ref:\t"+bx+" "+bz);
+			System.out.println("Est:\t"+halfwx+" "+halfwy+" "+halfwz+" "+Math.sqrt(halfwx*halfwx+halfwy*halfwy+halfwz*halfwz) );
+			System.out.println("Real:\t"+mx+" "+my+" "+mz+" "+Math.sqrt(mx*mx+my*my+mz*mz));
+			System.out.println();
+			*/
 			// Error is sum of cross product between estimated direction and measured direction of field vectors
-			halfex = (my * halfwz - mz * halfwy);
-			halfey = (mz * halfwx - mx * halfwz);
-			halfez = (mx * halfwy - my * halfwx);
+			halfex += (my * halfwz - mz * halfwy);
+			halfey += (mz * halfwx - mx * halfwz);
+			halfez += (mx * halfwy - my * halfwx);
+			
+			System.out.println("Ref:\t"+bx+" "+bz);
+			System.out.println("Est:\t"+halfwx+" "+halfwy+" "+halfwz+" "+Math.sqrt(halfwx*halfwx + halfwy*halfwy + halfwz*halfwz) );
+			System.out.println("Real:\t"+mx+" "+my+" "+mz+" "+Math.sqrt(mx*mx + my*my + mz*mz));
+			System.out.println("Err:\t"+halfex+" "+halfey+" "+halfez+" "+Math.sqrt(halfex*halfex + halfey*halfey + halfez*halfez));
+			System.out.println();
 		}
 
 		// Compute feedback only if accelerometer measurement valid (avoids NaN in accelerometer normalisation)
@@ -122,8 +138,8 @@ public class DCMlogic {
 			halfey += (az * halfvx - ax * halfvz);
 			halfez += (ax * halfvy - ay * halfvx);
 			
-			System.out.println("HalfV|"+"halfvx: "+halfvx+" halfvy: "+halfvy+" halfvz: "+halfvz);
-			System.out.println("Halferr|"+"halfex: "+halfex+" halfey: "+halfey+" halfez: "+halfez);
+			//System.out.println("HalfV|"+"halfvx: "+halfvx+" halfvy: "+halfvy+" halfvz: "+halfvz);
+			//System.out.println("Halferr|"+"halfex: "+halfex+" halfey: "+halfey+" halfez: "+halfez);
 		}
 
 		// Apply feedback only when valid data has been gathered from the accelerometer or magnetometer
@@ -136,7 +152,7 @@ public class DCMlogic {
 				gx += integralFBx;  // apply integral feedback
 				gy += integralFBy;
 				gz += integralFBz;
-				System.out.println("Integrating!");
+				//System.out.println("Integrating!");
 			}
 			else {
 				integralFBx = 0.0f; // prevent integral windup
@@ -169,11 +185,13 @@ public class DCMlogic {
 		q2 *= recipNorm;
 		q3 *= recipNorm;
 		
+		/*
 		System.out.print(q0+" ");
 		System.out.print(q1+" ");
 		System.out.print(q2+" ");
 		System.out.print(q3+" ");
 		System.out.println();
+		*/
 	}
 	
 	public void MadgwickAHRSupdate(float gx, float gy, float gz, float ax, float ay, float az, float mx, float my, float mz) {

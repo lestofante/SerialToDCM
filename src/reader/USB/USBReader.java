@@ -50,7 +50,10 @@ public class USBReader extends SensorReader implements USBLIstener{
 	public void setRawGyroscope(short x, short y, short z) {
 		if (accOk==true && magneOk==true){
 			//System.out.println("Valori giro"+x+" "+y+ " "+z);
-			//my = mx = mz = 0;
+			
+			//ay = ax = az = 0;
+			my = mx = mz = 0;
+			
 			dcm.FreeIMUUpdate(-x*toRad, -y*toRad, z*toRad, -this.ay, this.ax, this.az, -this.my, this.mx, this.mz);
 			accOk = magneOk = false;
 			my = mx = mz = 0;
