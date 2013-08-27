@@ -35,6 +35,20 @@ public class DCMlogic {
 
 	private float integralFBz;
 	public void FreeIMUUpdate(float gx, float gy, float gz, float ax, float ay, float az, float mx, float my, float mz){
+		
+		/* DYANMIC FREQUENCY! */
+		if (count == -1){ //just the first time!
+			lastFreqUp = System.currentTimeMillis();
+		}
+		count ++;
+		if (System.currentTimeMillis()-lastFreqUp>=1000){
+			System.out.println("Frequenza: "+count );
+			sampleFreq = count;
+			count=0;
+			lastFreqUp = System.currentTimeMillis();
+		}
+		/* END DYANMIC FREQUENCY! */
+		
 		gyro = gyro.add( new Vector3f(gx, gy, gz).mult(1.0f/sampleFreq) );//lol, simple integration?
 		simpleGyro = new Vector3f(gx, gy, gz).mult(1.0f/sampleFreq);
 

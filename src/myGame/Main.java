@@ -11,6 +11,7 @@ import DCM.GyroControl;
 
 import com.jme3.app.SimpleApplication;
 import com.jme3.math.ColorRGBA;
+import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.niftygui.NiftyJmeDisplay;
 import com.jme3.renderer.Camera;
@@ -65,8 +66,8 @@ public class Main extends SimpleApplication implements ScreenController {
 	public void simpleInitApp() {
 		
 		/** Configure cam to look at scene */
-		cam.setLocation(new Vector3f(0, 20f, 60f));
-		cam.lookAt(new Vector3f(2, 15, 0), Vector3f.UNIT_Y);
+		cam.setLocation(new Vector3f(60, 0f, 0f));
+		cam.lookAt(new Vector3f(0, 0, 15), Vector3f.UNIT_Y);
 		
 		/*Setup viewports*/
 		setupViewPorts();
@@ -125,15 +126,18 @@ public class Main extends SimpleApplication implements ScreenController {
 	private void setupViewPorts() {
 		
 		cam.setViewPort(0.0f,0.5f,0.0f,0.5f); // resize the viewPort
-		cam.setLocation(new Vector3f(40.0f, 0.0f, 0.0f));
+		cam.setLocation(new Vector3f(0.0f, 40.0f, 0.0f));
+		//Quaternion q = new Quaternion();
+		//cam.setRotation(q);
 		cam.lookAt(Vector3f.ZERO, Vector3f.UNIT_Y);
+		
 		Camera cam2 =  cam.clone();
 		cam2.setViewPort(0.5f,1.0f,0.0f,0.5f); // resize the viewPort
-		cam2.setLocation(new Vector3f(new Vector3f(40.0f, 0.0f, 0.0f)));
+		cam2.setLocation(new Vector3f(new Vector3f(0.0f, 40.0f, 0.0f)));
 		cam2.lookAt(Vector3f.ZERO, Vector3f.UNIT_Y);
 		Camera cam3 = cam.clone();
 		cam3.setViewPort(0.5f,1.0f,0.5f,1.0f); // resize the viewPort
-		cam3.setLocation(new Vector3f(new Vector3f(40.0f, 0.0f, 0.0f)));
+		cam3.setLocation(new Vector3f(new Vector3f(0.0f, 40.0f, 0.0f)));
 		cam3.lookAt(Vector3f.ZERO, Vector3f.UNIT_Y);
 		Camera cam4 = cam.clone();
 		cam4.setViewPort(0.0f,0.5f,0.5f,1.0f); // resize the viewPort
