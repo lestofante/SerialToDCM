@@ -3,6 +3,7 @@ package myGame;
 import com.jme3.asset.AssetManager;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
+import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
@@ -42,16 +43,23 @@ public class AxesObject {
 		//node.attachChild(arm3);
 		//return node;
 		
-		//Material mat_default = new Material(assetManager, "Models/Boeing747/B-747.mtl");
+		//
 		//Spatial teapot = assetManager.loadModel("Models/Boeing747/B-747.obj");
-		
-		Spatial teapot = assetManager.loadModel("Models/suzanne/suzanne.obj");
+		Spatial teapot = assetManager.loadModel("Models/A10/A10.obj");
+		//Spatial teapot = assetManager.loadModel("Models/suzanne/suzanne.obj");
 		final Material material3 = new Material(assetManager, "Common/MatDefs/Misc/ShowNormals.j3md");
+		
+		
 		teapot.setMaterial(material3);
 	    //teapot.setMaterial(mat_default);
 
 		final Node node = new Node("Plane");
 		node.attachChild(teapot);
+		
+		Quaternion rA = new Quaternion(new float[]{  0, 0, -(float) Math.PI/2  });
+		Quaternion rB = new Quaternion(new float[]{  0,(float) Math.PI/2, 0 });
+		
+		teapot.setLocalRotation(rA.mult(rB));
 		return node;
 	}
 

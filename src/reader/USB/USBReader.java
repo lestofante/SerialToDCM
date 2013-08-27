@@ -48,7 +48,7 @@ public class USBReader extends SensorReader implements USBLIstener{
 
 	@Override
 	public void setRawGyroscope(short x, short y, short z) {
-		if (accOk==true && magneOk==true){
+		if (accOk==true || magneOk==true){
 			//System.out.println("Valori giro"+x+" "+y+ " "+z);
 			
 			//ay = ax = az = 0;
