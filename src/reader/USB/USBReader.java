@@ -23,6 +23,7 @@ public class USBReader extends SensorReader implements USBLIstener{
 	
 	short ax, ay, az;
 	boolean accOk = false;
+	boolean magneOk = false;
 	private short mz;
 	private short my;
 	private short mx;
@@ -39,17 +40,19 @@ public class USBReader extends SensorReader implements USBLIstener{
 	@Override
 	public void setRawMagnetometer(short x, short y, short z) {
 		this.mx = x;
-		this.my = y;
-		this.mz = z;
+		//because magnetometer Y and Z axes is inverted respect to other sensor, but i wanted to keep the same come on stm
+		this.my = z;
+		this.mz = y;
+		magneOk = true;
 	}
 
 	@Override
 	public void setRawGyroscope(short x, short y, short z) {
-		if (accOk==true){
+		if (accOk==true && magneOk==true){
 			//System.out.println("Valori giro"+x+" "+y+ " "+z);
 			//my = mx = mz = 0;
-			dcm.FreeIMUUpdate(-x*toRad, -y*toRad, z*toRad, -this.ay, this.ax, this.az, -this.mz, this.mx, this.my);
-			accOk = false;
+			dcm.FreeIMUUpdate(-x*toRad, -y*toRad, z*toRad, -this.ay, this.ax, this.az, -this.my, this.mx, this.mz);
+			accOk = magneOk = false;
 			my = mx = mz = 0;
 			ay = ax = az = 0;
 		}
