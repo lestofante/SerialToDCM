@@ -21,13 +21,10 @@ public class AudioReader extends SensorReader implements Runnable{
 		super(dcm);
 	}
 	private Vector3f gyroVec;
-	private Vector3f accVec;
-	private Vector3f magVec;
-	private Vector3f testVec;
 	boolean stampaValori = false;
 	public final AtomicBoolean leggi = new AtomicBoolean(true);
 	
-	final static boolean debugByte = false;
+	static boolean debugByte = false;
 
 	int lettureValide=0;
 	
@@ -293,20 +290,16 @@ public class AudioReader extends SensorReader implements Runnable{
 					countGyro++;
 					break;
 				case 'M':
-					magVec = lettura;
 					countMag++;
 					break;
 				case 'A':
-					accVec = lettura;
 					countAcc++;
 					break;
 				case 'T':
-					testVec = lettura;
 					diffTest++;
 					//System.out.println("test vect: "+lettura);
 					break;
 				case 'S':
-					testVec = lettura;
 					diffMs++;
 					System.out.println("S RICEVUTA, TEMPO : "+(System.currentTimeMillis()-lastMilliS) );
 					lastMilliS = System.currentTimeMillis();
@@ -454,7 +447,6 @@ public class AudioReader extends SensorReader implements Runnable{
 	}
 	*/
 	Vector3f lastGyro = null, lastAcc=null, lastMag = null;
-	private float SOGLIA_GYRO = 2000;
 	private int diffGyro = 0, diffAcc = 0, diffMagne = 0, diffTest=0, diffMs=0;
 	/*
 	private void calibra(Vector3f gyroVec, Vector3f accVec, Vector3f magVec) {

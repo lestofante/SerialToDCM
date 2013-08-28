@@ -2,7 +2,6 @@ package myGame;
 
 import reader.SensorReader;
 import reader.USB.USBReader;
-import reader.audio.AudioReader;
 import myGame.GUI.GuiManager;
 import DCM.AcceControl;
 import DCM.DCMControl;
@@ -10,13 +9,15 @@ import DCM.MagControl;
 import DCM.GyroControl;
 
 import com.jme3.app.SimpleApplication;
+import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
-import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.niftygui.NiftyJmeDisplay;
 import com.jme3.renderer.Camera;
 import com.jme3.renderer.ViewPort;
+import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
+import com.jme3.scene.shape.Sphere;
 
 import de.lessvoid.nifty.Nifty;
 import de.lessvoid.nifty.screen.Screen;
@@ -42,7 +43,7 @@ public class Main extends SimpleApplication implements ScreenController {
 	AxesObject obj1;
 	AxesObject obj2;
 	AxesObject obj3;
-	AxesObject obj4;
+	//AxesObject obj4;
 	
 	DCMlogic dcm = new DCMlogic();
 	
@@ -75,12 +76,26 @@ public class Main extends SimpleApplication implements ScreenController {
 		obj1 = new AxesObject(assetManager);
 		obj2 = new AxesObject(assetManager);
 		obj3 = new AxesObject(assetManager);
-		obj4 = new AxesObject(assetManager);
+		//obj4 = new AxesObject(assetManager);
+		
+		
+		Sphere sphere = new Sphere(10, 10, 0.05f);
+		final Geometry point = new Geometry("sphere", sphere);
+		
+		final Material material1 = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+		material1.setColor("Color", new ColorRGBA(0, 0, 1, 1));
+		
+		point.setMaterial(material1);
+		Node obj5 = new Node();
+		
+		obj5.attachChild(point);
 		
 		obj1.getGeometry().addControl(new DCMControl(dcm));
 		obj2.getGeometry().addControl(new AcceControl(dcm));
 		obj3.getGeometry().addControl(new GyroControl(dcm));
-		obj4.getGeometry().addControl(new MagControl(dcm));
+		//obj4.getGeometry().addControl(new MagControl(dcm, assetManager));
+		
+		obj5.addControl(new MagControl(dcm, assetManager));
 		
 		rootNode.attachChild(rootNode1);
 		rootNode.attachChild(rootNode2);
@@ -90,7 +105,9 @@ public class Main extends SimpleApplication implements ScreenController {
 		rootNode1.attachChild(obj1.getGeometry());
 		rootNode2.attachChild(obj2.getGeometry());
 		rootNode3.attachChild(obj3.getGeometry());
-		rootNode4.attachChild(obj4.getGeometry());		
+		//rootNode4.attachChild(obj4.getGeometry());		
+		
+		rootNode4.attachChild(obj5);
 		
 		initializeGUI();
 		
@@ -141,7 +158,7 @@ public class Main extends SimpleApplication implements ScreenController {
 		cam3.lookAt(Vector3f.ZERO, Vector3f.UNIT_Y);
 		Camera cam4 = cam.clone();
 		cam4.setViewPort(0.0f,0.5f,0.5f,1.0f); // resize the viewPort
-		cam4.setLocation(new Vector3f(new Vector3f(40.0f, 0.0f, 0.0f)));
+		cam4.setLocation(new Vector3f(new Vector3f(0.0f, 10.0f, 0.0f)));
 		cam4.lookAt(Vector3f.ZERO, Vector3f.UNIT_Y);
 		
 		flyCam.setEnabled(false);

@@ -110,12 +110,13 @@ public class DCMlogic {
 			halfex += (my * halfwz - mz * halfwy);
 			halfey += (mz * halfwx - mx * halfwz);
 			halfez += (mx * halfwy - my * halfwx);
-			
+			/*
 			System.out.println("Ref:\t"+bx+" "+bz);
 			System.out.println("Est:\t"+halfwx+" "+halfwy+" "+halfwz+" "+Math.sqrt(halfwx*halfwx + halfwy*halfwy + halfwz*halfwz) );
 			System.out.println("Real:\t"+mx+" "+my+" "+mz+" "+Math.sqrt(mx*mx + my*my + mz*mz));
 			System.out.println("Err:\t"+halfex+" "+halfey+" "+halfez+" "+Math.sqrt(halfex*halfex + halfey*halfey + halfez*halfez));
 			System.out.println();
+			*/
 		}
 
 		// Compute feedback only if accelerometer measurement valid (avoids NaN in accelerometer normalisation)

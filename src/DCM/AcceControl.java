@@ -1,6 +1,5 @@
 package DCM;
 
-
 import myGame.DCMlogic;
 
 import com.jme3.math.Quaternion;
@@ -40,11 +39,11 @@ public class AcceControl extends AbstractControl {
 		
 		Vector3f temp = dcm.getAcc();	
 		
-		
+		/*
 		float a = temp.z;
 		temp.z = -temp.y;
 		temp.y = a;
-		
+		*/
 		
 		Quaternion q = new Quaternion();
 		q.lookAt(temp, Vector3f.UNIT_Z);
