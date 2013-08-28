@@ -85,7 +85,16 @@ public class MagControl extends AbstractControl {
 		
 		float colore = map(temp.length(), 250, 350, 0, 1);
 		
-		material1.setColor("Color", new ColorRGBA(colore, 0, 0, 0.8f));
+		int colore2 = 0, colore3 = 0;
+		if (temp.length()<250){
+			colore2 = 1;
+		}
+		
+		if (temp.length()>350){
+			colore3 = 1;
+		}
+		
+		material1.setColor("Color", new ColorRGBA(colore, colore2, colore3, 0.8f));
 		
 		point.setMaterial(material1);
 		
