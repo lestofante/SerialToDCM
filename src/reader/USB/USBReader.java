@@ -115,6 +115,7 @@ public class USBReader extends SensorReader implements USBLIstener{
 		if (accOk==true && magneOk==true){
 			//System.out.println("Valori giro"+x+" "+y+ " "+z);
 			
+			x = y = z =0;
 			ay = ax = az = 0;
 			//my = mx = mz = 0;
 			
@@ -124,10 +125,6 @@ public class USBReader extends SensorReader implements USBLIstener{
 			ay = ax = az = 0;
 		}
 		
-	}
-
-	float map(float x, float in_min, float in_max, float out_min, float out_max){
-	  return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 	}
 	
 	

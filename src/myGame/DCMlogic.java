@@ -34,6 +34,12 @@ public class DCMlogic {
 	private float integralFBy;
 
 	private float integralFBz;
+	
+	
+	float map(float x, float in_min, float in_max, float out_min, float out_max){
+		return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+	}
+	
 	public void FreeIMUUpdate(float gx, float gy, float gz, float ax, float ay, float az, float mx, float my, float mz){
 		
 		/* DYANMIC FREQUENCY! */
@@ -54,6 +60,10 @@ public class DCMlogic {
 
 		acc = new Vector3f(ax, ay, az);
 
+		mx = map(mx-17, -452, 452, -300, 300);
+		my = map(my-2, -472, 472, -300, 300);
+		mz = map(mz-25, -415, 415, -300, 300);
+		
 		magn = new Vector3f(mx, my, mz);
 
 		
@@ -76,6 +86,7 @@ public class DCMlogic {
 
 		// Use magnetometer measurement only when valid (avoids NaN in magnetometer normalisation)
 		if(mx != 0.0f || my != 0.0f || mz != 0.0f) {
+			
 			float hx, hy, bx, bz;
 			float halfwx, halfwy, halfwz;
 
@@ -91,6 +102,9 @@ public class DCMlogic {
 			bx = (float) Math.sqrt(hx * hx + hy * hy);
 			bz = 2.0f * (mx * (q1q3 - q0q2) + my * (q2q3 + q0q1) + mz * (0.5f - q1q1 - q2q2));
 
+			//bx = 0.9932459f;
+			//bz = -0.116027266f;
+			
 			// Estimated direction of magnetic field
 			halfwx = bx * (0.5f - q2q2 - q3q3) + bz * (q1q3 - q0q2);
 			halfwy = bx * (q1q2 - q0q3) + bz * (q0q1 + q2q3);
@@ -110,13 +124,19 @@ public class DCMlogic {
 			halfex += (my * halfwz - mz * halfwy);
 			halfey += (mz * halfwx - mx * halfwz);
 			halfez += (mx * halfwy - my * halfwx);
-			/*
-			System.out.println("Ref:\t"+bx+" "+bz);
-			System.out.println("Est:\t"+halfwx+" "+halfwy+" "+halfwz+" "+Math.sqrt(halfwx*halfwx + halfwy*halfwy + halfwz*halfwz) );
-			System.out.println("Real:\t"+mx+" "+my+" "+mz+" "+Math.sqrt(mx*mx + my*my + mz*mz));
-			System.out.println("Err:\t"+halfex+" "+halfey+" "+halfez+" "+Math.sqrt(halfex*halfex + halfey*halfey + halfez*halfez));
-			System.out.println();
-			*/
+			
+			
+			
+			if ( Math.sqrt(halfex*halfex + halfey*halfey + halfez*halfez)<0.1f ){
+				halfex= halfey = halfez = 0;
+			}else{
+				System.out.println("Ref:\t"+bx+" "+bz);
+				System.out.println("Est:\t"+halfwx+" "+halfwy+" "+halfwz+" "+Math.sqrt(halfwx*halfwx + halfwy*halfwy + halfwz*halfwz) );
+				System.out.println("Real:\t"+mx+" "+my+" "+mz+" "+Math.sqrt(mx*mx + my*my + mz*mz));
+				System.out.println("Err:\t"+halfex+" "+halfey+" "+halfez+" "+Math.sqrt(halfex*halfex + halfey*halfey + halfez*halfez));
+				System.out.println();
+			}
+			
 		}
 
 		// Compute feedback only if accelerometer measurement valid (avoids NaN in accelerometer normalisation)

@@ -70,11 +70,12 @@ public class MagControl extends AbstractControl {
 		q.lookAt(temp, Vector3f.UNIT_Y);
 		getSpatial().setLocalRotation(q);
 		*/
+		/*
 		temp.x = map(temp.x-17, -452, 452, -300, 300);
 		temp.y = map(temp.y-2, -472, 472, -300, 300);
 		temp.z = map(temp.z-25, -415, 415, -300, 300);
-		
-		System.out.println("lengh:"+temp.length() );
+		*/
+		//System.out.println("lengh:"+temp.length() );
 		
 		
 		Sphere sphere = new Sphere(10, 10, 0.05f);
