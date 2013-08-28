@@ -45,10 +45,10 @@ public class USBReader extends SensorReader implements USBLIstener{
 	long lastUp = 0;
 	@Override
 	public void setRawMagnetometer(short x, short y, short z) {
-		this.mx = (short) x;
+		this.mx = x;//(short) map(x-15, -405, 405, -350, 350);
 		//because magnetometer Y and Z axes is inverted respect to other sensor, but i wanted to keep the same come on stm. Also Z has different measure
-		this.my = (short) Math.round( z * (980.0/1100.0) );
-		this.mz = (short) y;
+		this.my = y;//(short) map(z*(1100/980), -470, 470, -350, 350);
+		this.mz = z;//(short) map(y-30, -420, 420, -350, 350);
 		
 		Vector3f floatM2 = new Vector3f(x, z , y);
 		
@@ -118,12 +118,18 @@ public class USBReader extends SensorReader implements USBLIstener{
 			ay = ax = az = 0;
 			//my = mx = mz = 0;
 			
-			dcm.FreeIMUUpdate(-x*toRad, -y*toRad, z*toRad, -this.ay, this.ax, this.az, this.my, -this.mx, -this.mz);
+			dcm.FreeIMUUpdate(-x*toRad, -y*toRad, z*toRad, -this.ay, this.ax, this.az, this.my*1.12f, -this.mx, -this.mz);
 			accOk = magneOk = false;
 			my = mx = mz = 0;
 			ay = ax = az = 0;
 		}
 		
 	}
+
+	float map(float x, float in_min, float in_max, float out_min, float out_max){
+	  return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+	}
+	
+	
 
 }

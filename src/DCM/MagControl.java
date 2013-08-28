@@ -58,6 +58,8 @@ public class MagControl extends AbstractControl {
 		Vector3f temp = dcm.getMagn();
 		
 		
+		if(temp.length() == 0)
+			return;
 		
 		/*float a = temp.z;
 		temp.z = temp.y;
@@ -68,6 +70,12 @@ public class MagControl extends AbstractControl {
 		q.lookAt(temp, Vector3f.UNIT_Y);
 		getSpatial().setLocalRotation(q);
 		*/
+		temp.x = map(temp.x-17, -452, 452, -300, 300);
+		temp.y = map(temp.y-2, -472, 472, -300, 300);
+		temp.z = map(temp.z-25, -415, 415, -300, 300);
+		
+		System.out.println("lengh:"+temp.length() );
+		
 		
 		Sphere sphere = new Sphere(10, 10, 0.05f);
 		final Geometry point = new Geometry("sphere", sphere);
@@ -75,7 +83,7 @@ public class MagControl extends AbstractControl {
 		
 		final Material material1 = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
 		
-		float colore = map(temp.length(), 380, 600, 0, 1);
+		float colore = map(temp.length(), 250, 350, 0, 1);
 		
 		material1.setColor("Color", new ColorRGBA(colore, 0, 0, 0.8f));
 		

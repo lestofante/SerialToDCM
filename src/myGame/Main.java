@@ -88,7 +88,10 @@ public class Main extends SimpleApplication implements ScreenController {
 		point.setMaterial(material1);
 		Node obj5 = new Node();
 		
+		point.setLocalTranslation(0, 0, 0);
+		
 		obj5.attachChild(point);
+		obj5.setLocalTranslation(0, 0, 0);
 		
 		obj1.getGeometry().addControl(new DCMControl(dcm));
 		obj2.getGeometry().addControl(new AcceControl(dcm));
