@@ -50,50 +50,6 @@ public class MagControl extends AbstractControl {
 	
 	@Override
 	protected void controlUpdate(float g0) {
-		
-		
-		/** loop sketch*/
-		//process buffers
-			//since we have different samplerates should we only get the last full information triplet
-		Vector3f temp = dcm.getMagn();
-		
-		
-		
-		/*float a = temp.z;
-		temp.z = temp.y;
-		temp.y = a;
-		*/
-		/*
-		Quaternion q = new Quaternion();
-		q.lookAt(temp, Vector3f.UNIT_Y);
-		getSpatial().setLocalRotation(q);
-		*/
-		
-		Sphere sphere = new Sphere(10, 10, 0.05f);
-		final Geometry point = new Geometry("sphere", sphere);
-		
-		
-		final Material material1 = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-		
-		float colore = map(temp.length(), 380, 600, 0, 1);
-		
-		material1.setColor("Color", new ColorRGBA(colore, 0, 0, 0.8f));
-		
-		point.setMaterial(material1);
-		
-		Node tmpN = new Node();
-		tmpN.attachChild(point);
-		
-		//temp = temp.normalize();
-		
-		tmpN.setLocalTranslation(temp.mult(0.01f));
-		plotPoint.add( tmpN );
-		getSpatial().getParent().attachChild(tmpN);
-		
-		if (plotPoint.size() > POINT_MAX_NUMBER){
-			getSpatial().getParent().detachChild(plotPoint.removeFirst());
-		}
-		
 	}
 	
 	float map(float x, float in_min, float in_max, float out_min, float out_max)

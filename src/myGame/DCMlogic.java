@@ -12,7 +12,7 @@ public class DCMlogic {
 	float twoKpDef = (2.0f * 0.5f);
 	public float q0 = 1, q1 = 0, q2 = 0, q3 = 0;
 	float twoKp = twoKpDef;
-	private float twoKi = 2.0f * 0.01f;
+	private float twoKi = 2.0f * 0.0f;
 
 	Vector3f gyro=new Vector3f(), acc=new Vector3f(), magn=new Vector3f(), simpleGyro=new Vector3f();
 

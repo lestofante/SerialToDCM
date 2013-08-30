@@ -1,5 +1,6 @@
 package reader.USB;
 
+import com.jme3.math.FastMath;
 import com.jme3.math.Vector3f;
 
 import myGame.DCMlogic;
@@ -29,6 +30,11 @@ public class USBReader extends SensorReader implements USBLIstener{
 	private short mz;
 	private short my;
 	private short mx;
+	
+	private static float xCenter = -18.5f;
+	private static float yCenter = -27.5f;
+	private static float zCenter = 8.0f;
+	
 	static float toRad = 35f/32768f;
 	
 	@Override
@@ -45,10 +51,15 @@ public class USBReader extends SensorReader implements USBLIstener{
 	long lastUp = 0;
 	@Override
 	public void setRawMagnetometer(short x, short y, short z) {
-		this.mx = (short) x;
-		//because magnetometer Y and Z axes is inverted respect to other sensor, but i wanted to keep the same come on stm. Also Z has different measure
-		this.my = (short) Math.round( z * (980.0/1100.0) );
-		this.mz = (short) y;
+		if(FastMath.abs(x-mx)<150){
+			mx = (short) (x - xCenter);
+		}
+		if(FastMath.abs(y-mz)<150){
+			mz = (short) (y - yCenter);
+		}
+		if(FastMath.abs(z-my)<150){
+			my = (short) (z - zCenter);
+		}
 		
 		Vector3f floatM2 = new Vector3f(x, z , y);
 		
@@ -115,13 +126,13 @@ public class USBReader extends SensorReader implements USBLIstener{
 		if (accOk==true && magneOk==true){
 			//System.out.println("Valori giro"+x+" "+y+ " "+z);
 			
-			ay = ax = az = 0;
+			//ay = ax = az = 0;
 			//my = mx = mz = 0;
 			
-			dcm.FreeIMUUpdate(-x*toRad, -y*toRad, z*toRad, -this.ay, this.ax, this.az, this.my, -this.mx, -this.mz);
+			dcm.FreeIMUUpdate(-x*toRad, -y*toRad, z*toRad, -this.ay, this.ax, this.az, -this.my, this.mx, this.mz);
 			accOk = magneOk = false;
-			my = mx = mz = 0;
-			ay = ax = az = 0;
+			//my = mx = mz = 0;
+			//ay = ax = az = 0;
 		}
 		
 	}
