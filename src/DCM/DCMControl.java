@@ -3,6 +3,7 @@ package DCM;
 
 import myGame.DCMlogic;
 
+import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
 import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.ViewPort;
@@ -36,7 +37,7 @@ public class DCMControl extends AbstractControl {
 	protected void controlUpdate(float g0) {
 		
 		//set convenient position for camera
-		getSpatial().getParent().setLocalRotation(new Quaternion(new float[]{0,-(float) (Math.PI/2),0}));
+		getSpatial().getParent().setLocalRotation(new Quaternion(new float[]{0,-(float) (Math.PI/2), 0}));
 		
 		Quaternion quat = dcm.getQuaternion();
 		

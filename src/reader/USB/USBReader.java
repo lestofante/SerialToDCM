@@ -10,8 +10,25 @@ import src.USBLIstener;
 
 public class USBReader extends SensorReader implements USBLIstener{
 
+	private static final float ALPHA = 0.01f;
+	private static float xCenterMag = -18.5f;
+	private static float yCenterMag = -27.5f;
+	private static float zCenterMag = 8.0f;
+
+	private static float xCenterAcc = -350f;
+	private static float yCenterAcc = -300f;
+	private static float zCenterAcc = -200f;
+
+	private static float xScaleAcc = 33100f;
+	private static float yScaleAcc = 33600f;
+	private static float zScaleAcc = 32400f;
+
+	private static float xScaleMag = 1f;
+	private static float yScaleMag = 1f;
+	private static float zScaleMag = 1f;
+
 	LibUSBTest usb = new LibUSBTest();
-	
+
 	public USBReader(DCMlogic dcm) {
 		super(dcm);
 		usb.setListener(this);
@@ -21,9 +38,9 @@ public class USBReader extends SensorReader implements USBLIstener{
 	@Override
 	public void connect() {
 		// TODO Auto-generated method stub
-		
+
 	}
-	
+
 	short ax, ay, az;
 	boolean accOk = false;
 	boolean magneOk = false;
@@ -31,110 +48,64 @@ public class USBReader extends SensorReader implements USBLIstener{
 	private short my;
 	private short mx;
 	
-	private static float xCenter = -18.5f;
-	private static float yCenter = -27.5f;
-	private static float zCenter = 8.0f;
-	
-	static float toRad = 35f/32768f;
-	
+	private float aXF;
+	private float aYF;
+	private float aZF;
+
+	static float toRad = FastMath.DEG_TO_RAD*(2293.76f/32768f);
+
 	@Override
 	public void setRawAccelerometer(short x, short y, short z) {
-		this.ax = x;
-		this.ay = y;
-		this.az = z;
+		float xF = (x - xCenterAcc);
+		float yF = (y - yCenterAcc);
+		float zF = (z - zCenterAcc);
+
+		xF /= xScaleAcc;
+		yF /= yScaleAcc;
+		zF /= zScaleAcc;
+
+		aXF += (aXF - xF) * ALPHA;
+		aYF += (aYF - xF) * ALPHA;
+		aZF += (aZF - xF) * ALPHA;
+
+		ax = (short) (xF * 200);
+		ay = (short) (yF * 200);
+		az = (short) (zF * 200);	
+		
 		accOk = true;
 	}
 
-	
+
 	short minx=Short.MAX_VALUE, miny=Short.MAX_VALUE, minz=Short.MAX_VALUE, maxx=Short.MIN_VALUE, maxy=Short.MIN_VALUE, maxz=Short.MIN_VALUE;
 	float minDist=Float.MAX_VALUE, maxDist = Float.MIN_VALUE;
 	long lastUp = 0;
 	@Override
 	public void setRawMagnetometer(short x, short y, short z) {
-		if(FastMath.abs(x-mx)<150){
-			mx = (short) (x - xCenter);
+		float xF = 0, yF = 0, zF = 0;
+
+		xF = x - xCenterMag;
+		yF = y - yCenterMag;
+		zF = z - zCenterMag;
+
+		yF /= yScaleMag;
+		xF /= xScaleMag;
+		zF /= zScaleMag;		
+
+		if(FastMath.abs(xF-mx)<150){
+			mx = (short) (xF);
 		}
-		if(FastMath.abs(y-mz)<150){
-			mz = (short) (y - yCenter);
+		if(FastMath.abs(yF-mz)<150){
+			mz = (short) (yF);
 		}
-		if(FastMath.abs(z-my)<150){
-			my = (short) (z - zCenter);
-		}
-		
-		Vector3f floatM2 = new Vector3f(x, z , y);
-		
-		if (x < minx){
-			minx = x;
-		}
-		if (y < miny){
-			miny = y;
-		}
-		if (z < minz){
-			minz = z;
-		}
-		
-		if (x > maxx){
-			maxx = x;
-		}
-		if (y > maxy){
-			maxy = y;
-		}
-		if (z > maxz){
-			maxz = z;
-		}
-		
-		if (floatM2.length() < minDist){
-			minDist = floatM2.length();
-		}
-		
-		if (floatM2.length() > maxDist){
-			maxDist = floatM2.length();
-		}
-		
-		if (System.currentTimeMillis()-lastUp>=1000){
-			System.out.println(minx+" <= x <= "+maxx);
-			System.out.println(miny+" <= y <= "+maxy);
-			System.out.println(minz+" <= z <= "+maxz);
-			System.out.println(minDist+" <= d <= "+maxDist);
-			
-			minx=miny=minz=Short.MAX_VALUE;
-			maxx=maxy=maxz=Short.MIN_VALUE;
-			minDist = Float.MAX_VALUE;
-			maxDist = Float.MIN_VALUE;
-			lastUp = System.currentTimeMillis();
-		}
-		
-		//Vector3f shotM = new Vector3f(x, (short)z<0?(z * (1100.0f/980.0f)):z, y);
-		
-		Vector3f floatM = new Vector3f(x/110, z/98, y/110 );
-		
-		
-		//System.out.print(   "Dist1: "+shotM.length() );
-		//System.out.println(   " Dist2: "+floatM.length()+" "+floatM );
-		//System.out.println( " Dist3: "+floatM2.length()+" "+floatM2 );
-		
-//		System.out.println( "Diff1: "+shotM.length() );	
-//		shotM = shotM.normalize();
-//		floatM = floatM.normalize();
-//		System.out.println( "Diff2: "+shotM.subtract(floatM).length() );
-		
+		if(FastMath.abs(zF-my)<150){
+			my = (short) (zF);	
+		}		
 		magneOk = true;
 	}
 
 	@Override
 	public void setRawGyroscope(short x, short y, short z) {
-		if (accOk==true && magneOk==true){
-			//System.out.println("Valori giro"+x+" "+y+ " "+z);
-			
-			//ay = ax = az = 0;
-			//my = mx = mz = 0;
-			
-			dcm.FreeIMUUpdate(-x*toRad, -y*toRad, z*toRad, -this.ay, this.ax, this.az, -this.my, this.mx, this.mz);
-			accOk = magneOk = false;
-			//my = mx = mz = 0;
-			//ay = ax = az = 0;
-		}
-		
+		dcm.MadgwickAHRSupdate(-x*toRad, -y*toRad, z*toRad, -this.ay, this.ax, this.az, -this.my, this.mx, this.mz);
 	}
 
 }

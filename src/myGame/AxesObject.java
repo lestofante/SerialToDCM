@@ -53,7 +53,7 @@ public class AxesObject {
 		node.attachChild(teapot);
 		
 		Quaternion rA = new Quaternion(new float[]{  0, 0, -(float) Math.PI/2  });
-		Quaternion rB = new Quaternion(new float[]{  0,(float) Math.PI/2, 0 });
+		Quaternion rB = new Quaternion(new float[]{  0, -(float) Math.PI/2, 0 });
 		
 		teapot.setLocalRotation(rA.mult(rB));
 		return node;
