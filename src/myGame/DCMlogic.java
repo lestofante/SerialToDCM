@@ -34,6 +34,8 @@ public class DCMlogic {
 	private float integralFBy;
 
 	private float integralFBz;
+
+	private float[] stmQ;
 	
 	
 	float map(float x, float in_min, float in_max, float out_min, float out_max){
@@ -538,5 +540,13 @@ public class DCMlogic {
 		synchronized (sincronizzaUpdate) {
 			return new Vector3f(magn); //copy!
 		}
+	}
+
+	public void setFromStm(float[] q) {
+		stmQ = q;
+	}
+
+	public Quaternion getQuaternionSTM() {
+		return new Quaternion(stmQ[0], stmQ[1], stmQ[2], stmQ[3]);
 	}
 }

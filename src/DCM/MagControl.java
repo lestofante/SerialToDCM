@@ -8,6 +8,7 @@ import myGame.DCMlogic;
 import com.jme3.asset.AssetManager;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
+import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.ViewPort;
@@ -50,67 +51,16 @@ public class MagControl extends AbstractControl {
 	
 	@Override
 	protected void controlUpdate(float g0) {
-		
-		
-		/** loop sketch*/
-		//process buffers
-			//since we have different samplerates should we only get the last full information triplet
-		Vector3f temp = dcm.getMagn();
-		
-		
-		if(temp.length() == 0)
-			return;
-		
-		/*float a = temp.z;
-		temp.z = temp.y;
-		temp.y = a;
-		*/
-		/*
-		Quaternion q = new Quaternion();
-		q.lookAt(temp, Vector3f.UNIT_Y);
+		//set convenient position for camera
+		getSpatial().getParent().setLocalRotation(new Quaternion(new float[]{0,-(float) (Math.PI/2),0}));
+				
+		Quaternion quat = dcm.getQuaternionSTM();
+				
+		//conjugate (black magic happen here)
+		Quaternion q = new Quaternion(quat.getX(),-quat.getY(),-quat.getZ(),-quat.getW() );
 		getSpatial().setLocalRotation(q);
-		*/
-		/*
-		temp.x = map(temp.x-17, -452, 452, -300, 300);
-		temp.y = map(temp.y-2, -472, 472, -300, 300);
-		temp.z = map(temp.z-25, -415, 415, -300, 300);
-		*/
-		//System.out.println("lengh:"+temp.length() );
 		
 		
-		Sphere sphere = new Sphere(10, 10, 0.05f);
-		final Geometry point = new Geometry("sphere", sphere);
-		
-		
-		final Material material1 = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-		
-		float colore = map(temp.length(), 250, 350, 0, 1);
-		
-		int colore2 = 0, colore3 = 0;
-		if (temp.length()<250){
-			colore2 = 1;
-		}
-		
-		if (temp.length()>350){
-			colore3 = 1;
-		}
-		
-		material1.setColor("Color", new ColorRGBA(colore, colore2, colore3, 0.8f));
-		
-		point.setMaterial(material1);
-		
-		Node tmpN = new Node();
-		tmpN.attachChild(point);
-		
-		//temp = temp.normalize();
-		
-		tmpN.setLocalTranslation(temp.mult(0.01f));
-		plotPoint.add( tmpN );
-		getSpatial().getParent().attachChild(tmpN);
-		
-		if (plotPoint.size() > POINT_MAX_NUMBER){
-			getSpatial().getParent().detachChild(plotPoint.removeFirst());
-		}
 		
 	}
 	

@@ -126,6 +126,11 @@ public class USBReader extends SensorReader implements USBLIstener{
 		}
 		
 	}
+
+	@Override
+	public void setDCM(float[] q) {
+		dcm.setFromStm(q);
+	}
 	
 	
 
