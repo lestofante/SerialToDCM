@@ -1,12 +1,11 @@
 package reader.USB;
 
-import com.jme3.math.FastMath;
-import com.jme3.math.Vector3f;
-
 import myGame.DCMlogic;
 import reader.SensorReader;
 import src.LibUSBTest;
 import src.USBLIstener;
+
+import com.jme3.math.FastMath;
 
 public class USBReader extends SensorReader implements USBLIstener{
 

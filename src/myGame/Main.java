@@ -95,7 +95,7 @@ public class Main extends SimpleApplication implements ScreenController {
 		obj3.getGeometry().addControl(new GyroControl(dcm));
 		//obj4.getGeometry().addControl(new MagControl(dcm, assetManager));
 		
-		obj5.addControl(new MagControl(dcm, assetManager));
+		obj5.addControl(new MagControl(dcm));
 		
 		rootNode.attachChild(rootNode1);
 		rootNode.attachChild(rootNode2);
