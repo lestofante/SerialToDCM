@@ -108,4 +108,9 @@ public class USBReader extends SensorReader implements USBLIstener{
 		dcm.MadgwickAHRSupdate(-x*toRad, -y*toRad, z*toRad, -this.ay, this.ax, this.az, -this.my, this.mx, this.mz);
 	}
 
+	@Override
+	public void setDCM(float[] q) {
+		dcm.setStmBypass(q);
+	}
+
 }

@@ -34,8 +34,12 @@ public class GyroControl extends AbstractControl {
 
 	@Override
 	protected void controlUpdate(float g0) {		
-		Vector3f vec = dcm.getSimpleGyro();		
-		Quaternion q = new Quaternion(new float[]{vec.x,vec.z,vec.y}); 
+		getSpatial().getParent().setLocalRotation(new Quaternion(new float[]{0,-(float) (Math.PI/2), 0}));
+		
+		Quaternion quat = dcm.getQuaternionStm();
+		
+		//conjugate (black magic happen here)
+		Quaternion q = new Quaternion(quat.getX(),-quat.getY(),-quat.getZ(),-quat.getW() );
 		getSpatial().setLocalRotation(q);
 	}
 

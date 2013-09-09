@@ -34,6 +34,8 @@ public class DCMlogic {
 	private float integralFBy;
 
 	private float integralFBz;
+
+	private float[] stmQuat = new float[4];
 	public void FreeIMUUpdate(float gx, float gy, float gz, float ax, float ay, float az, float mx, float my, float mz){
 		
 		/* DYANMIC FREQUENCY! */
@@ -512,5 +514,13 @@ public class DCMlogic {
 		synchronized (sincronizzaUpdate) {
 			return new Vector3f(magn); //copy!
 		}
+	}
+
+	public void setStmBypass(float[] q) {
+		stmQuat = q;
+	}
+
+	public Quaternion getQuaternionStm() {
+		return new Quaternion(stmQuat[0],stmQuat[1], stmQuat[2], stmQuat[3]);
 	}
 }
