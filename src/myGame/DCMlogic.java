@@ -6,10 +6,12 @@ import com.jme3.math.Vector3f;
 
 public class DCMlogic {
 
+	private static final float c = 10;
+
 	private final Object sincronizzaUpdate = new Object();
 
 	float sampleFreq = 100;
-	float twoKpDef = (2.0f * 0.1f);
+	float twoKpDef = (2.0f * 0.05f);
 	public float q0 = 1, q1 = 0, q2 = 0, q3 = 0;
 	float twoKp = twoKpDef;
 	private float twoKi = 2.0f * 0.0f;
@@ -34,6 +36,7 @@ public class DCMlogic {
 	private float integralFBy;
 
 	private float integralFBz;
+
 	public void FreeIMUUpdate(float gx, float gy, float gz, float ax, float ay, float az, float mx, float my, float mz){
 		
 		/* DYANMIC FREQUENCY! */
@@ -296,7 +299,7 @@ public class DCMlogic {
 				_4bx = 2.0f * _2bx;
 				_4bz = 2.0f * _2bz;
 
-				// Gradient decent algorithm corrective step
+				// Gradient descent algorithm corrective step
 				s0 = -_2q2
 						* (2.0f * q1q3 - _2q0q2 - ax)
 						+ _2q1

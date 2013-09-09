@@ -41,10 +41,9 @@ public class AxesObject {
 		
 		//
 		//Spatial teapot = assetManager.loadModel("Models/Boeing747/B-747.obj");
-		Spatial teapot = assetManager.loadModel("Models/A10/A10.obj");
+		Spatial teapot = assetManager.loadModel("Models/Plane/plane.obj");
 		//Spatial teapot = assetManager.loadModel("Models/suzanne/suzanne.obj");
 		final Material material3 = new Material(assetManager, "Common/MatDefs/Misc/ShowNormals.j3md");
-		
 		
 		teapot.setMaterial(material3);
 	    //teapot.setMaterial(mat_default);
@@ -56,6 +55,7 @@ public class AxesObject {
 		Quaternion rB = new Quaternion(new float[]{  0, -(float) Math.PI/2, 0 });
 		
 		teapot.setLocalRotation(rA.mult(rB));
+		teapot.setLocalScale(5);
 		return node;
 	}
 

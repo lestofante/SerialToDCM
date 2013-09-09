@@ -10,7 +10,7 @@ import src.USBLIstener;
 
 public class USBReader extends SensorReader implements USBLIstener{
 
-	private static final float ALPHA = 0.01f;
+	private static final float ALPHA = 1f;
 	private static float xCenterMag = -18.5f;
 	private static float yCenterMag = -27.5f;
 	private static float zCenterMag = 8.0f;
@@ -23,9 +23,9 @@ public class USBReader extends SensorReader implements USBLIstener{
 	private static float yScaleAcc = 33600f;
 	private static float zScaleAcc = 32400f;
 
-	private static float xScaleMag = 1f;
-	private static float yScaleMag = 1f;
-	private static float zScaleMag = 1f;
+	private static float xScaleMag = 548f;
+	private static float yScaleMag = 530f;
+	private static float zScaleMag = 545f;
 
 	LibUSBTest usb = new LibUSBTest();
 
@@ -47,7 +47,7 @@ public class USBReader extends SensorReader implements USBLIstener{
 	private short mz;
 	private short my;
 	private short mx;
-	
+
 	private float aXF;
 	private float aYF;
 	private float aZF;
@@ -71,7 +71,7 @@ public class USBReader extends SensorReader implements USBLIstener{
 		ax = (short) (xF * 200);
 		ay = (short) (yF * 200);
 		az = (short) (zF * 200);	
-		
+
 		accOk = true;
 	}
 
@@ -87,25 +87,28 @@ public class USBReader extends SensorReader implements USBLIstener{
 		yF = y - yCenterMag;
 		zF = z - zCenterMag;
 
-		yF /= yScaleMag;
-		xF /= xScaleMag;
-		zF /= zScaleMag;		
+		xF *= 1000/xScaleMag;
+		yF *= 1000/yScaleMag;
+		zF *= 1000/zScaleMag;
 
-		if(FastMath.abs(xF-mx)<150){
-			mx = (short) (xF);
-		}
-		if(FastMath.abs(yF-mz)<150){
-			mz = (short) (yF);
-		}
-		if(FastMath.abs(zF-my)<150){
-			my = (short) (zF);	
-		}		
+		mx = (short) (xF);
+		mz = (short) (yF);
+		my = (short) (zF);	
+		
 		magneOk = true;
 	}
 
 	@Override
 	public void setRawGyroscope(short x, short y, short z) {
-		dcm.MadgwickAHRSupdate(-x*toRad, -y*toRad, z*toRad, -this.ay, this.ax, this.az, -this.my, this.mx, this.mz);
+		//dcm.MadgwickAHRSupdate(-x*toRad, -y*toRad, z*toRad, -this.ay, this.ax, this.az, -this.my, this.mx, this.mz);
+	}
+
+	@Override
+	public void setDCM(float[] q) {
+		dcm.q0 = q[0];
+		dcm.q1 = q[1];
+		dcm.q2 = q[2];
+		dcm.q3 = q[3];
 	}
 
 }
