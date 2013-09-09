@@ -9,7 +9,7 @@ public class DCMlogic {
 	private final Object sincronizzaUpdate = new Object();
 
 	float sampleFreq = 100;
-	float twoKpDef = (2.0f * 4.0f);
+	float twoKpDef = (2.0f * 0.1f);
 	public float q0 = 1, q1 = 0, q2 = 0, q3 = 0;
 	float twoKp = twoKpDef;
 	private float twoKi = 2.0f * 0.0f;
@@ -36,6 +36,8 @@ public class DCMlogic {
 	private float integralFBz;
 
 	private float[] stmQuat = new float[4];
+
+	private float[] yprBypass = new float[3];
 	public void FreeIMUUpdate(float gx, float gy, float gz, float ax, float ay, float az, float mx, float my, float mz){
 		
 		/* DYANMIC FREQUENCY! */
@@ -524,5 +526,13 @@ public class DCMlogic {
 
 	public Quaternion getQuaternionStm() {
 		return new Quaternion(stmQuat[0],stmQuat[1], stmQuat[2], stmQuat[3]);
+	}
+
+	public void setYprStm(float[] ypr) {
+		yprBypass = ypr;
+	}
+
+	public float[] getYprStm() {
+		return yprBypass;
 	}
 }

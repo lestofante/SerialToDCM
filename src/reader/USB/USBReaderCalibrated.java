@@ -107,4 +107,9 @@ public class USBReaderCalibrated extends SensorReader implements USBLIstener{
 		dcm.setStmBypass(q);
 	}
 
+	@Override
+	public void setEulerianBypass(float[] ypr) {
+		dcm.setYprStm(ypr);
+	}
+
 }
