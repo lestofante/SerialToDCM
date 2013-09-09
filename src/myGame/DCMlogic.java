@@ -9,7 +9,7 @@ public class DCMlogic {
 	private final Object sincronizzaUpdate = new Object();
 
 	float sampleFreq = 100;
-	float twoKpDef = (2.0f * 1.0f);
+	float twoKpDef = (2.0f * 4.0f);
 	public float q0 = 1, q1 = 0, q2 = 0, q3 = 0;
 	float twoKp = twoKpDef;
 	private float twoKi = 2.0f * 0.0f;
@@ -481,6 +481,8 @@ public class DCMlogic {
 	}
 
 	public Quaternion getQuaternion() {
+		//System.out.println("STM "+stmQuat[0]+" "+stmQuat[1]+" "+stmQuat[2]+" "+stmQuat[3]);
+		//System.out.println("JAVA "+q0+" "+q1+" "+q2+" "+q3);
 		synchronized (sincronizzaUpdate) {
 			return new Quaternion(q0, q1, q2, q3);
 		}

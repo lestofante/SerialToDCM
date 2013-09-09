@@ -2,6 +2,7 @@ package myGame;
 
 import reader.SensorReader;
 import reader.USB.USBReader;
+import reader.USB.USBReaderCalibrated;
 import myGame.GUI.GuiManager;
 import DCM.AcceControl;
 import DCM.DCMControl;
@@ -47,7 +48,7 @@ public class Main extends SimpleApplication implements ScreenController {
 	
 	DCMlogic dcm = new DCMlogic();
 	
-	SensorReader sensorInput = new USBReader(dcm);
+	SensorReader sensorInput = new USBReaderCalibrated(dcm);
 	
 	private Nifty nifty;
 	
@@ -65,12 +66,6 @@ public class Main extends SimpleApplication implements ScreenController {
 
 	@Override
 	public void simpleInitApp() {
-		
-		/** Configure cam to look at scene */
-		cam.setLocation(new Vector3f(60, 0f, 0f));
-		cam.lookAt(new Vector3f(0, 0, 15), Vector3f.UNIT_Y);
-		
-		/*Setup viewports*/
 		setupViewPorts();
 		
 		obj1 = new AxesObject(assetManager);
