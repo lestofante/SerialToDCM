@@ -6,12 +6,10 @@ import com.jme3.math.Vector3f;
 
 public class DCMlogic {
 
-	private static final float c = 10;
-
 	private final Object sincronizzaUpdate = new Object();
 
 	float sampleFreq = 100;
-	float twoKpDef = (2.0f * 0.05f);
+	float twoKpDef = (2.0f * 1.0f);
 	public float q0 = 1, q1 = 0, q2 = 0, q3 = 0;
 	float twoKp = twoKpDef;
 	private float twoKi = 2.0f * 0.0f;
@@ -37,6 +35,7 @@ public class DCMlogic {
 
 	private float integralFBz;
 
+	private float[] stmQuat = new float[4];
 	public void FreeIMUUpdate(float gx, float gy, float gz, float ax, float ay, float az, float mx, float my, float mz){
 		
 		/* DYANMIC FREQUENCY! */
@@ -515,5 +514,13 @@ public class DCMlogic {
 		synchronized (sincronizzaUpdate) {
 			return new Vector3f(magn); //copy!
 		}
+	}
+
+	public void setStmBypass(float[] q) {
+		stmQuat = q;
+	}
+
+	public Quaternion getQuaternionStm() {
+		return new Quaternion(stmQuat[0],stmQuat[1], stmQuat[2], stmQuat[3]);
 	}
 }

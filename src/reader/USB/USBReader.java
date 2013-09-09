@@ -1,12 +1,11 @@
 package reader.USB;
 
-import com.jme3.math.FastMath;
-import com.jme3.math.Vector3f;
-
 import myGame.DCMlogic;
 import reader.SensorReader;
 import src.LibUSBTest;
 import src.USBLIstener;
+
+import com.jme3.math.FastMath;
 
 public class USBReader extends SensorReader implements USBLIstener{
 
@@ -100,15 +99,12 @@ public class USBReader extends SensorReader implements USBLIstener{
 
 	@Override
 	public void setRawGyroscope(short x, short y, short z) {
-		//dcm.MadgwickAHRSupdate(-x*toRad, -y*toRad, z*toRad, -this.ay, this.ax, this.az, -this.my, this.mx, this.mz);
+		dcm.FreeIMUUpdate(-x*toRad, -y*toRad, z*toRad, -this.ay, this.ax, this.az, -this.my, this.mx, this.mz);
 	}
 
 	@Override
 	public void setDCM(float[] q) {
-		dcm.q0 = q[0];
-		dcm.q1 = q[1];
-		dcm.q2 = q[2];
-		dcm.q3 = q[3];
+		dcm.setStmBypass(q);
 	}
 
 }

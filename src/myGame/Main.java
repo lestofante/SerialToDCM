@@ -95,7 +95,7 @@ public class Main extends SimpleApplication implements ScreenController {
 		obj3.getGeometry().addControl(new GyroControl(dcm));
 		//obj4.getGeometry().addControl(new MagControl(dcm, assetManager));
 		
-		obj5.addControl(new MagControl(dcm, assetManager));
+		obj5.addControl(new MagControl(dcm));
 		
 		rootNode.attachChild(rootNode1);
 		rootNode.attachChild(rootNode2);
@@ -144,8 +144,6 @@ public class Main extends SimpleApplication implements ScreenController {
 		
 		cam.setViewPort(0.0f,0.5f,0.0f,0.5f); // resize the viewPort
 		cam.setLocation(new Vector3f(0.0f, 40.0f, 0.0f));
-		//Quaternion q = new Quaternion();
-		//cam.setRotation(q);
 		cam.lookAt(Vector3f.ZERO, Vector3f.UNIT_Y);
 		
 		Camera cam2 =  cam.clone();
@@ -158,7 +156,7 @@ public class Main extends SimpleApplication implements ScreenController {
 		cam3.lookAt(Vector3f.ZERO, Vector3f.UNIT_Y);
 		Camera cam4 = cam.clone();
 		cam4.setViewPort(0.0f,0.5f,0.5f,1.0f); // resize the viewPort
-		cam4.setLocation(new Vector3f(new Vector3f(0.0f, 10.0f, 0.0f)));
+		cam4.setLocation(new Vector3f(new Vector3f(0.0f, 40.0f, 0.0f)));
 		cam4.lookAt(Vector3f.ZERO, Vector3f.UNIT_Y);
 		
 		flyCam.setEnabled(false);
@@ -183,8 +181,8 @@ public class Main extends SimpleApplication implements ScreenController {
 		fb4.setMoveSpeed(speed);
 		
 		ViewPort view1 = viewPort;
-		view1.setClearFlags(true, true, true);
 		view1.clearScenes();
+		view1.setClearFlags(true, true, true);
 		view1.attachScene(rootNode1);
 		view1.setBackgroundColor(ColorRGBA.Black);
 		
