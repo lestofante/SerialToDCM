@@ -3,7 +3,6 @@ package DCM;
 import myGame.DCMlogic;
 
 import com.jme3.math.Quaternion;
-import com.jme3.math.Vector3f;
 import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.ViewPort;
 import com.jme3.scene.Spatial;
@@ -33,22 +32,18 @@ public class AcceControl extends AbstractControl {
 	@Override
 	protected void controlUpdate(float g0) {
 		
-		/** loop sketch*/
-		//process buffers
-			//since we have different samplerates should we only get the last full information triplet
+		getSpatial().getParent().setLocalRotation(new Quaternion(new float[]{0,-(float) (Math.PI/2), 0}));
 		
-		Vector3f temp = dcm.getAcc();	
+		float[] yprStm = dcm.getYprStm();
 		
-		/*
-		float a = temp.z;
-		temp.z = -temp.y;
-		temp.y = a;
-		*/
+		float temp = yprStm[1];
+		yprStm[1] = yprStm[2];
+		yprStm[2] = temp;
 		
+		//conjugate (black magic happen here)
 		Quaternion q = new Quaternion();
-		q.lookAt(temp, Vector3f.UNIT_Z);
+		q.fromAngles(yprStm);
 		getSpatial().setLocalRotation(q);
-		
 		
 	}
 

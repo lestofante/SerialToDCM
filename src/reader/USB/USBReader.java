@@ -78,6 +78,7 @@ public class USBReader extends SensorReader implements USBLIstener{
 	short minx=Short.MAX_VALUE, miny=Short.MAX_VALUE, minz=Short.MAX_VALUE, maxx=Short.MIN_VALUE, maxy=Short.MIN_VALUE, maxz=Short.MIN_VALUE;
 	float minDist=Float.MAX_VALUE, maxDist = Float.MIN_VALUE;
 	long lastUp = 0;
+	
 	@Override
 	public void setRawMagnetometer(short x, short y, short z) {
 		float xF = 0, yF = 0, zF = 0;
@@ -105,6 +106,11 @@ public class USBReader extends SensorReader implements USBLIstener{
 	@Override
 	public void setDCM(float[] q) {
 		dcm.setStmBypass(q);
+	}
+
+	@Override
+	public void setEulerianBypass(float[] ypr) {
+		dcm.setYprStm(ypr);
 	}
 
 }
