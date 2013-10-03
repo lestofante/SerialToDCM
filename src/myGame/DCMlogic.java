@@ -9,7 +9,7 @@ public class DCMlogic {
 	private final Object sincronizzaUpdate = new Object();
 
 	float sampleFreq = 100;
-	float twoKpDef = (2.0f * 0.1f);
+	float twoKpDef = (2.0f * 0.5f);
 	public float q0 = 1, q1 = 0, q2 = 0, q3 = 0;
 	float twoKp = twoKpDef;
 	private float twoKi = 2.0f * 0.0f;

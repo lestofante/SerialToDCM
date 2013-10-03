@@ -21,7 +21,11 @@
   			
   			<control name="label" id="mag" width="100%"
   				align="left">
-  			</control> 
+  			</control>
+  			
+  			<control id="sliderH" name="horizontalSlider"
+  				align="left">
+  			</control>
   		</panel>
   	</layer>
   </screen>
