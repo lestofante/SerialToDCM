@@ -32,9 +32,13 @@ public class AcceControl extends AbstractControl {
 	@Override
 	protected void controlUpdate(float g0) {
 		
-		//getSpatial().getParent().setLocalRotation(new Quaternion(new float[]{0,-(float) (Math.PI/2), 0}));
+		getSpatial().getParent().setLocalRotation(new Quaternion(new float[]{0,-(float) (Math.PI/2), 0}));
 		
 		float[] yprStm = dcm.getYprStm();
+		getSpatial().setLocalRotation(new Quaternion().fromAngles(0, 0, 0));
+		getSpatial().rotate(-yprStm[0],0,0);
+		getSpatial().rotate(0,yprStm[1],0);
+		getSpatial().rotate(0,0,yprStm[2]);
 		
 		/*
 		float temp = yprStm[1];
@@ -42,9 +46,9 @@ public class AcceControl extends AbstractControl {
 		yprStm[2] = temp;*/
 		
 		//conjugate (black magic happen here)
-		Quaternion q = new Quaternion();
-		q.fromAngles(yprStm);
-		getSpatial().setLocalRotation(q);
+		//Quaternion q = new Quaternion();
+		//q.fromAngles(yprStm);
+		//getSpatial().setLocalRotation(q);
 		
 	}
 
