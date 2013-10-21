@@ -118,10 +118,4 @@ public class USBReaderCalibrated extends SensorReader implements USBLIstener{
 		
 	}
 
-	@Override
-	public void setRPM(float rpm) {
-		// TODO Auto-generated method stub
-		
-	}
-
 }
