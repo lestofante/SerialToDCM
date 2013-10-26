@@ -1,9 +1,18 @@
 package reader.USB;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
+
 import myGame.DCMlogic;
 import reader.SensorReader;
 import src.LibUSBTest;
 import src.USBLIstener;
+import src.USBWriter;
 
 import com.jme3.math.FastMath;
 
@@ -15,6 +24,8 @@ public class USBReader extends SensorReader implements USBLIstener{
 		super(dcm);
 		usb.setListener(this);
 		new Thread(usb).start();
+		
+		
 	}
 
 	@Override
@@ -54,12 +65,6 @@ public class USBReader extends SensorReader implements USBLIstener{
 	@Override
 	public void setEulerianBypass(float[] ypr) {
 		dcm.setYprStm(ypr);
-	}
-
-	@Override
-	public void setPWM(long pwm) {
-		// TODO Auto-generated method stub
-		
 	}
 
 }
