@@ -1,13 +1,13 @@
 package myGame;
 
-import reader.SensorReader;
-import reader.USB.USBReader;
-import reader.USB.USBReaderCalibrated;
 import myGame.GUI.GuiManager;
+import reader.SensorReader;
+import reader.USB.USBReaderCalibrated;
+import reader.cdc.ReadCDC;
 import DCM.AcceControl;
 import DCM.DCMControl;
-import DCM.MagControl;
 import DCM.GyroControl;
+import DCM.MagControl;
 
 import com.jme3.app.SimpleApplication;
 import com.jme3.material.Material;
@@ -48,7 +48,7 @@ public class Main extends SimpleApplication implements ScreenController {
 	
 	DCMlogic dcm = new DCMlogic();
 	
-	SensorReader sensorInput = new USBReaderCalibrated(dcm);
+	SensorReader sensorInput = new ReadCDC(dcm);
 	
 	private Nifty nifty;
 	

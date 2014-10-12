@@ -29,6 +29,7 @@ public class USBReader extends SensorReader implements USBLIstener{
 
 	@Override
 	public void setRawAccelerometer(short x, short y, short z) {
+		System.out.println("readed acce "+x+" "+y+" "+z);
 		ax = x;
 		ay = y;
 		az = z;
@@ -36,6 +37,7 @@ public class USBReader extends SensorReader implements USBLIstener{
 
 	@Override
 	public void setRawMagnetometer(short x, short y, short z) {
+		System.out.println("readed magne "+x+" "+y+" "+z);
 		mx = x;
 		my = z;
 		mz = y;		
@@ -43,23 +45,20 @@ public class USBReader extends SensorReader implements USBLIstener{
 
 	@Override
 	public void setRawGyroscope(short x, short y, short z) {
+		System.out.println("readed gyro "+x+" "+y+" "+z);
 		dcm.FreeIMUUpdate(-x*toRad, -y*toRad, z*toRad, -this.ay, this.ax, this.az, -this.my, this.mx, this.mz);
 	}
 
 	@Override
 	public void setDCM(float[] q) {
+		System.out.println("readed DCM "+q[0]+" "+q[1]+" "+q[2]+" "+q[3]);
 		dcm.setStmBypass(q);
 	}
 
 	@Override
 	public void setEulerianBypass(float[] ypr) {
+		System.out.println("readed EULERIAN "+ypr[0]+" "+ypr[1]+" "+ypr[2]);
 		dcm.setYprStm(ypr);
-	}
-
-	@Override
-	public void setPWM(long pwm) {
-		// TODO Auto-generated method stub
-		
 	}
 
 }

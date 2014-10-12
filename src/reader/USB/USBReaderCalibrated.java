@@ -112,10 +112,5 @@ public class USBReaderCalibrated extends SensorReader implements USBLIstener{
 		dcm.setYprStm(ypr);
 	}
 
-	@Override
-	public void setPWM(long pwm) {
-		// TODO Auto-generated method stub
-		
-	}
 
 }

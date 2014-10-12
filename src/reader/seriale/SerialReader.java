@@ -54,7 +54,7 @@ public class SerialReader extends SensorReader implements SerialPortEventListene
 		try {
 			String portName = "";
 			if (portName.equals("")) {
-				portName = "/dev/ttyUSB0";
+				portName = "/dev/ttyACM0";
 			}
 			System.out.println("Apro la porta: " + portName);
 			CommPortIdentifier portIdentifier = CommPortIdentifier
