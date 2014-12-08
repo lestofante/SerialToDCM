@@ -4,6 +4,7 @@ package DCM;
 import myGame.DCMlogic;
 
 import com.jme3.math.Quaternion;
+import com.jme3.math.Vector3f;
 import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.ViewPort;
 import com.jme3.scene.Spatial;
@@ -32,7 +33,16 @@ public class GyroControl extends AbstractControl {
 	}
 
 	@Override
-	protected void controlUpdate(float g0) {		
+	protected void controlUpdate(float g0) {
+		getSpatial().getParent().setLocalRotation(new Quaternion(new float[]{0,-(float) (Math.PI/2), 0}));
+		
+		Vector3f yprStm = dcm.getGyro();
+		getSpatial().setLocalRotation(new Quaternion().fromAngles(0, 0, 0));
+		getSpatial().rotate(yprStm.x,0,0);
+		getSpatial().rotate(0,yprStm.z,0);
+		getSpatial().rotate(0,0,yprStm.y);
+		
+		/*
 		getSpatial().getParent().setLocalRotation(new Quaternion(new float[]{0,-(float) (Math.PI/2), 0}));
 		
 		Quaternion quat = dcm.getQuaternionStm();
@@ -40,6 +50,7 @@ public class GyroControl extends AbstractControl {
 		//conjugate (black magic happen here)
 		Quaternion q = new Quaternion(quat.getX(),-quat.getY(),-quat.getZ(),-quat.getW() );
 		getSpatial().setLocalRotation(q);
+		*/
 	}
 
 }

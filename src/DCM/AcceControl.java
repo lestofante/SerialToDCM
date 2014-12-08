@@ -3,6 +3,7 @@ package DCM;
 import myGame.DCMlogic;
 
 import com.jme3.math.Quaternion;
+import com.jme3.math.Vector3f;
 import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.ViewPort;
 import com.jme3.scene.Spatial;
@@ -34,11 +35,11 @@ public class AcceControl extends AbstractControl {
 		
 		getSpatial().getParent().setLocalRotation(new Quaternion(new float[]{0,-(float) (Math.PI/2), 0}));
 		
-		float[] yprStm = dcm.getYprStm();
+		Vector3f yprStm = dcm.getAcc();
 		getSpatial().setLocalRotation(new Quaternion().fromAngles(0, 0, 0));
-		getSpatial().rotate(-yprStm[0],0,0);
-		getSpatial().rotate(0,yprStm[1],0);
-		getSpatial().rotate(0,0,yprStm[2]);
+		getSpatial().rotate(yprStm.x,0,0);
+		getSpatial().rotate(0,yprStm.z,0);
+		getSpatial().rotate(0,0,yprStm.y);
 		
 		/*
 		float temp = yprStm[1];

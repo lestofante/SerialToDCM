@@ -229,6 +229,7 @@ public class DCMlogic {
 
 			gyro = gyro.add( new Vector3f(gx, gy, gz).mult(1.0f/sampleFreq) );//lol, simple integration?
 			simpleGyro = new Vector3f(gx, gy, gz).mult(1.0f/sampleFreq);
+			
 			//gyro = new Vector3f(gx, gy, gz).mult(1.0f/sampleFreq);
 
 			//gx=gy=gz=0;//deactiuvate gyro!

@@ -2,8 +2,7 @@ package myGame;
 
 import myGame.GUI.GuiManager;
 import reader.SensorReader;
-import reader.USB.USBReaderCalibrated;
-import reader.cdc.ReadCDC;
+import reader.seriale.SerialReader2;
 import DCM.AcceControl;
 import DCM.DCMControl;
 import DCM.GyroControl;
@@ -48,7 +47,7 @@ public class Main extends SimpleApplication implements ScreenController {
 	
 	DCMlogic dcm = new DCMlogic();
 	
-	SensorReader sensorInput = new ReadCDC(dcm);
+	SensorReader sensorInput = new SerialReader2(dcm);
 	
 	private Nifty nifty;
 	
