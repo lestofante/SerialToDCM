@@ -536,4 +536,12 @@ public class DCMlogic {
 	public float[] getYprStm() {
 		return yprBypass;
 	}
+
+	public void update(float x, float y, float z, float x2, float y2, float z2, int i, int j, int k) {
+		FreeIMUUpdate(x, y, z, x2, y2, z2, i, j, k);
+	}
+
+	public void update(float x, float y, float z, float x2, float y2, float z2, float x3, float y3, float z3) {
+		FreeIMUUpdate(x, y, z, x2, y2, z2, 0, 0, 0);
+	}
 }

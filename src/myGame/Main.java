@@ -43,7 +43,7 @@ public class Main extends SimpleApplication implements ScreenController {
 	AxesObject obj1;
 	AxesObject obj2;
 	AxesObject obj3;
-	//AxesObject obj4;
+	AxesObject obj4;
 	
 	DCMlogic dcm = new DCMlogic();
 	
@@ -70,9 +70,9 @@ public class Main extends SimpleApplication implements ScreenController {
 		obj1 = new AxesObject(assetManager);
 		obj2 = new AxesObject(assetManager);
 		obj3 = new AxesObject(assetManager);
-		//obj4 = new AxesObject(assetManager);
+		obj4 = new AxesObject(assetManager);
 		
-		
+		/*
 		Sphere sphere = new Sphere(10, 10, 0.05f);
 		final Geometry point = new Geometry("sphere", sphere);
 		
@@ -83,13 +83,14 @@ public class Main extends SimpleApplication implements ScreenController {
 		Node obj5 = new Node();
 		
 		obj5.attachChild(point);
+		*/
 		
 		obj1.getGeometry().addControl(new DCMControl(dcm));
 		obj2.getGeometry().addControl(new AcceControl(dcm));
 		obj3.getGeometry().addControl(new GyroControl(dcm));
-		//obj4.getGeometry().addControl(new MagControl(dcm, assetManager));
+		obj4.getGeometry().addControl(new MagControl(dcm));
 		
-		obj5.addControl(new MagControl(dcm));
+		//obj5.addControl(new MagControl(dcm));
 		
 		rootNode.attachChild(rootNode1);
 		rootNode.attachChild(rootNode2);
@@ -99,9 +100,9 @@ public class Main extends SimpleApplication implements ScreenController {
 		rootNode1.attachChild(obj1.getGeometry());
 		rootNode2.attachChild(obj2.getGeometry());
 		rootNode3.attachChild(obj3.getGeometry());
-		//rootNode4.attachChild(obj4.getGeometry());		
+		rootNode4.attachChild(obj4.getGeometry());		
 		
-		rootNode4.attachChild(obj5);
+		//rootNode4.attachChild(obj5);
 		
 		initializeGUI();
 		

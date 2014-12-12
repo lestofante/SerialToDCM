@@ -6,5 +6,6 @@
 	<classpathentry kind="lib" path="RXTXcomm.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/USBTest"/>
 	<classpathentry kind="lib" path="jMonkeyEngine3.jar"/>
+	<classpathentry kind="lib" path="jssc.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

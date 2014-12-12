@@ -1,22 +1,22 @@
 package DCM;
 
 
-import java.util.LinkedList;
-
 import myGame.DCMlogic;
 
+import com.jme3.math.Quaternion;
+import com.jme3.math.Vector3f;
 import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.ViewPort;
-import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.control.AbstractControl;
 import com.jme3.scene.control.Control;
 
 public class MagControl extends AbstractControl {
 
-	LinkedList <Node> plotPoint = new LinkedList<>();
+	private DCMlogic dcm;
 
 	public MagControl(final DCMlogic dcm){
+		this.dcm = dcm;
 	}
 	
 
@@ -36,11 +36,13 @@ public class MagControl extends AbstractControl {
 	
 	@Override
 	protected void controlUpdate(float g0) {
-	}
-	
-	float map(float x, float in_min, float in_max, float out_min, float out_max)
-	{
-	  return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+		getSpatial().getParent().setLocalRotation(new Quaternion(new float[]{0,-(float) (Math.PI/2), 0}));
+		
+		Vector3f yprStm = dcm.getMagn();
+		getSpatial().setLocalRotation(new Quaternion().fromAngles(0, 0, 0));
+		getSpatial().rotate(yprStm.x,0,0);
+		getSpatial().rotate(0,yprStm.z,0);
+		getSpatial().rotate(0,0,yprStm.y);
 	}
 
 }
