@@ -9,7 +9,7 @@ public class DCMlogic {
 	private final Object sincronizzaUpdate = new Object();
 
 	float sampleFreq = 100;
-	float twoKpDef = (2.0f * 0.5f);
+	float twoKpDef = (5.0f);
 	public float q0 = 1, q1 = 0, q2 = 0, q3 = 0;
 	float twoKp = twoKpDef;
 	private float twoKi = 2.0f * 0.0f;
@@ -79,9 +79,10 @@ public class DCMlogic {
 		q3q3 = q3 * q3;
 
 		// Use magnetometer measurement only when valid (avoids NaN in magnetometer normalisation)
+		float halfwx=0, halfwy=0, halfwz=0;
 		if(mx != 0.0f || my != 0.0f || mz != 0.0f) {
 			float hx, hy, bx, bz;
-			float halfwx, halfwy, halfwz;
+			
 
 			// Normalise magnetometer measurement
 			recipNorm = invSqrt(mx * mx + my * my + mz * mz);
@@ -110,10 +111,7 @@ public class DCMlogic {
 			System.out.println("Real:\t"+mx+" "+my+" "+mz+" "+Math.sqrt(mx*mx+my*my+mz*mz));
 			System.out.println();
 			*/
-			// Error is sum of cross product between estimated direction and measured direction of field vectors
-			halfex += (my * halfwz - mz * halfwy);
-			halfey += (mz * halfwx - mx * halfwz);
-			halfez += (mx * halfwy - my * halfwx);
+
 			/*
 			System.out.println("Ref:\t"+bx+" "+bz);
 			System.out.println("Est:\t"+halfwx+" "+halfwy+" "+halfwz+" "+Math.sqrt(halfwx*halfwx + halfwy*halfwy + halfwz*halfwz) );
@@ -124,8 +122,8 @@ public class DCMlogic {
 		}
 
 		// Compute feedback only if accelerometer measurement valid (avoids NaN in accelerometer normalisation)
+		float halfvx=0, halfvy=0, halfvz=0;
 		if(ax != 0.0f || ay != 0.0f || az != 0.0f) {
-			float halfvx, halfvy, halfvz;
 
 			// Normalise accelerometer measurement
 			recipNorm = invSqrt(ax * ax + ay * ay + az * az);
@@ -137,16 +135,15 @@ public class DCMlogic {
 			halfvx = q1q3 - q0q2;
 			halfvy = q0q1 + q2q3;
 			halfvz = q0q0 - 0.5f + q3q3;
-
-			// Error is sum of cross product between estimated direction and measured direction of field vectors
-			halfex += (ay * halfvz - az * halfvy);
-			halfey += (az * halfvx - ax * halfvz);
-			halfez += (ax * halfvy - ay * halfvx);
 			
 			//System.out.println("HalfV|"+"halfvx: "+halfvx+" halfvy: "+halfvy+" halfvz: "+halfvz);
 			//System.out.println("Halferr|"+"halfex: "+halfex+" halfey: "+halfey+" halfez: "+halfez);
 		}
 
+		halfex = (ay * halfvz - az * halfvy) + (my * halfwz - mz * halfwy);
+		halfey = (az * halfvx - ax * halfvz) + (mz * halfwx - mx * halfwz);
+		halfez = (ax * halfvy - ay * halfvx) + (mx * halfwy - my * halfwx);
+		
 		// Apply feedback only when valid data has been gathered from the accelerometer or magnetometer
 		if(halfex != 0.0f || halfey != 0.0f || halfez != 0.0f) {
 			// Compute and apply integral feedback if enabled
@@ -536,12 +533,12 @@ public class DCMlogic {
 	public float[] getYprStm() {
 		return yprBypass;
 	}
-
+	/*
 	public void update(float x, float y, float z, float x2, float y2, float z2, int i, int j, int k) {
 		FreeIMUUpdate(x, y, z, x2, y2, z2, i, j, k);
-	}
+	}*/
 
 	public void update(float x, float y, float z, float x2, float y2, float z2, float x3, float y3, float z3) {
-		FreeIMUUpdate(x, y, z, x2, y2, z2, 0, 0, 0);
+		FreeIMUUpdate(x, y, z, x2, y2, z2, x3, y3, z3);
 	}
 }

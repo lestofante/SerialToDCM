@@ -1,19 +1,19 @@
 package reader.seriale;
 
-import com.jme3.math.Vector3f;
-
 import jssc.SerialPort;
 import jssc.SerialPortException;
 import myGame.DCMlogic;
 import reader.SensorReader;
 
+import com.jme3.math.Vector3f;
+
 public class SerialReader2 extends SensorReader implements Runnable {
 
 	private SerialPort serialPort;
 	
-	private int g=0, m=0, a=0, e=0;
-	private static final int toAvoid = 2;
-	private static final int toRead = 8;
+	private int g=0, m=0, a=0, e=0, q=0;
+	private static final int toAvoid = 0;
+	//private static final int toRead = 8;
 	
 	public SerialReader2(DCMlogic dcm) {
 		super(dcm);
@@ -95,19 +95,50 @@ public class SerialReader2 extends SensorReader implements Runnable {
 		long time = System.currentTimeMillis();
 		long count = 0;
 		while (true) {
-			byte[] buffer = serialPort.readBytes(toRead);// Read 8 bytes from serial port
-
-			if (buffer.length != toRead){
-				System.out.println("len unexpected: "+buffer.length);
+			byte[] buffer = serialPort.readBytes(2);// Read 2 bytes from serial port (header)
+			count += buffer.length;
+			int low = ((int)buffer[0]) & 0xFF;
+			int high = ((int)buffer[1])<<8;
+			int header = high+low;
+			int toRead=6;
+			//int header =0;
+			//byte header = buffer[0];
+			//System.out.println("header:"+buffer[0]+" "+buffer[1]+" "+header);
+			switch((byte)header){
+				case 0: //gyro
+					break;
+				case 1: //acce
+					break;
+				case 2: //magne
+					break;
+				case 3: //gyro err
+					System.out.println("Gyro too fast");
+					break;
+				case 4: //acce err
+					System.out.println("Acce too fast");
+					break;
+				case 5: //magne err
+					System.out.println("Magne too fast");
+					break;
+				case 6: //quaternion
+					//System.out.println("Quaternion!");
+					q++;
+					toRead = 16; //4byte * 4 float
+					break;
+				default:
+					System.out.println("wrong header!"+buffer[0]+" "+buffer[1]+" "+header);
 			}
-			analize(buffer);
+			
+			buffer = serialPort.readBytes(toRead);// Read toRead bytes from serial port (header)
+			
+			analize((byte)header, buffer);
 
 			count += buffer.length;
 			if (System.currentTimeMillis() - time >= 1000) {
 				long timeElaplsed = System.currentTimeMillis() - time;
 				System.out.println("velocità lettura B/s: " + count * (timeElaplsed / 1000));
-				System.out.println("letture g/a/m/errori: " + g+"/"+ a+"/"+ m+"/"+e);
-				g=a=m=e=0;
+				System.out.println("letture g/a/m/errori/queternioni: " + g+"/"+ a+"/"+ m+"/"+e+"/"+q);
+				g=a=m=e=q=0;
 				count = 0;
 				time = System.currentTimeMillis();
 			}
@@ -119,9 +150,9 @@ public class SerialReader2 extends SensorReader implements Runnable {
 	final float mdpsOverDigitAt250 = 8.75f;
 	final float mdpsOverDigitAt500 = 17.5f;
 	final float mdpsOverDigitAt2000 = 70;
-	private void analize(byte[] buffer) { //remember; message are left to right
+	private void analize(byte header, byte[] buffer) { //remember; message are left to right
 		
-		switch (buffer[0]) {
+		switch ( header ) {
 		case 0:
 			g++;
 			gyroVec = new Vector3f();
@@ -154,13 +185,16 @@ public class SerialReader2 extends SensorReader implements Runnable {
 				int uint8 = high+low;
 				switch (i) {
 				case 0:
-					magVec.y = -uint8;
+					//magVec.y = -uint8;
+					magVec.x = uint8;
 					break;
 				case 1:
-					magVec.z = uint8;
+					//magVec.z = uint8;
+					magVec.y = uint8;
 					break;
 				case 2:
-					magVec.x = uint8;
+					//magVec.x = uint8;
+					magVec.z = uint8;
 					break;
 				}
 			}
@@ -178,12 +212,15 @@ public class SerialReader2 extends SensorReader implements Runnable {
 				int uint8 = high+low;
 				switch (i) {
 				case 0:
-					accVec.y = -uint8;
-					break;
-				case 1:
+					//accVec.y = -uint8;
 					accVec.x = uint8;
 					break;
+				case 1:
+					//accVec.x = uint8;
+					accVec.y = uint8;
+					break;
 				case 2:
+					//accVec.z = uint8;
 					accVec.z = uint8;
 					break;
 				}
@@ -193,8 +230,24 @@ public class SerialReader2 extends SensorReader implements Runnable {
 				System.out.println("A:"+accVec);
 			}
 			break;
-		case 3:
-			System.out.print("ERRORE:");
+		case 6:
+			/*
+			System.out.print("quat:");
+			for (int i=0;i< 4; i++){
+				int ris=0;
+				int ris2=0;
+				for (int f=0;f< 4; f++){
+					ris = ris << 8;
+					ris |= buffer[(3-f)+i*4]& 0xFF;
+					ris2 = ris2 << 8;
+					ris2 |= buffer[f+i*4] & 0xFF;
+				}
+				float risF = Float.intBitsToFloat(ris);
+				float risF2 = Float.intBitsToFloat(ris2);
+				System.out.print(risF+"/"+risF2+" ");
+			}
+			System.out.println();
+			*/
 			break;
 		case 'S':
 			System.out.print("read/s:");
@@ -206,6 +259,8 @@ public class SerialReader2 extends SensorReader implements Runnable {
 			}
 			System.out.println();
 			break;
+		case 3:
+			System.out.print("ERRORE:");
 		default:
 			
 			System.out.print("Errore: ");
@@ -227,13 +282,22 @@ public class SerialReader2 extends SensorReader implements Runnable {
 			}
 			gyroVec = accVec = magVec = null;
 		}
-		
+		/*
 		if (gyroVec != null && accVec != null) {
-			accVec = accVec.normalize();
 			dcm.update(gyroVec.x, gyroVec.y, gyroVec.z, accVec.x, accVec.y, accVec.z, 0, 0, 0);
 			gyroVec = accVec = null;
 		}
 		
+		if (gyroVec != null && magVec != null) {
+			dcm.update(gyroVec.x, gyroVec.y, gyroVec.z, 0, 0, 0, magVec.x, magVec.y, magVec.z);
+			gyroVec = accVec = null;
+		}
+		
+		if (magVec != null) {
+			dcm.update(0, 0, 0, 0, 0, 0, magVec.x, magVec.y, magVec.z);
+			gyroVec = accVec = null;
+		}
+		*/
 	}
 
 }
