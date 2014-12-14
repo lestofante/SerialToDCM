@@ -5,19 +5,17 @@ import reader.SensorReader;
 import reader.seriale.SerialReader2;
 import DCM.AcceControl;
 import DCM.DCMControl;
+import DCM.DirectQuaternionControl;
 import DCM.GyroControl;
 import DCM.MagControl;
 
 import com.jme3.app.SimpleApplication;
-import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
 import com.jme3.niftygui.NiftyJmeDisplay;
 import com.jme3.renderer.Camera;
 import com.jme3.renderer.ViewPort;
-import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
-import com.jme3.scene.shape.Sphere;
 
 import de.lessvoid.nifty.Nifty;
 import de.lessvoid.nifty.screen.Screen;
@@ -39,11 +37,13 @@ public class Main extends SimpleApplication implements ScreenController {
 	Node rootNode2 = new Node();
 	Node rootNode3 = new Node();
 	Node rootNode4 = new Node();
+	Node rootNode5 = new Node();
 
 	AxesObject obj1;
 	AxesObject obj2;
 	AxesObject obj3;
 	AxesObject obj4;
+	AxesObject obj5;
 	
 	DCMlogic dcm = new DCMlogic();
 	
@@ -71,6 +71,7 @@ public class Main extends SimpleApplication implements ScreenController {
 		obj2 = new AxesObject(assetManager);
 		obj3 = new AxesObject(assetManager);
 		obj4 = new AxesObject(assetManager);
+		obj5 = new AxesObject(assetManager);
 		
 		/*
 		Sphere sphere = new Sphere(10, 10, 0.05f);
@@ -89,20 +90,21 @@ public class Main extends SimpleApplication implements ScreenController {
 		obj2.getGeometry().addControl(new AcceControl(dcm));
 		obj3.getGeometry().addControl(new GyroControl(dcm));
 		obj4.getGeometry().addControl(new MagControl(dcm));
+		obj5.getGeometry().addControl(new DirectQuaternionControl(dcm));
 		
-		//obj5.addControl(new MagControl(dcm));
 		
 		rootNode.attachChild(rootNode1);
 		rootNode.attachChild(rootNode2);
 		rootNode.attachChild(rootNode3);
 		rootNode.attachChild(rootNode4);
+		rootNode.attachChild(rootNode5);
 		
 		rootNode1.attachChild(obj1.getGeometry());
 		rootNode2.attachChild(obj2.getGeometry());
 		rootNode3.attachChild(obj3.getGeometry());
-		rootNode4.attachChild(obj4.getGeometry());		
-		
-		//rootNode4.attachChild(obj5);
+		rootNode4.attachChild(obj4.getGeometry());
+		rootNode5.attachChild(obj5.getGeometry());
+
 		
 		initializeGUI();
 		
@@ -153,6 +155,10 @@ public class Main extends SimpleApplication implements ScreenController {
 		cam4.setViewPort(0.0f,0.5f,0.5f,1.0f); // resize the viewPort
 		cam4.setLocation(new Vector3f(new Vector3f(0.0f, 40.0f, 0.0f)));
 		cam4.lookAt(Vector3f.ZERO, Vector3f.UNIT_Y);
+		Camera cam5 = cam.clone();
+		cam5.setViewPort(0.0f,0.5f,0.5f,1.0f); // resize the viewPort
+		cam5.setLocation(new Vector3f(new Vector3f(0.0f, 40.0f, 0.0f)));
+		cam5.lookAt(Vector3f.ZERO, Vector3f.UNIT_Y);
 		
 		flyCam.setEnabled(false);
 		
@@ -168,12 +174,17 @@ public class Main extends SimpleApplication implements ScreenController {
 		MyFlyBy fb4 = new MyFlyBy(cam4);
 		fb4.registerWithInput(inputManager);
 		fb4.setDragToRotate(true);
+		MyFlyBy fb5 = new MyFlyBy(cam5);
+		fb5.registerWithInput(inputManager);
+		fb5.setDragToRotate(true);
+		
 		
 		float speed = 20;
 		fb1.setMoveSpeed(speed);
 		fb2.setMoveSpeed(speed);
 		fb3.setMoveSpeed(speed);
 		fb4.setMoveSpeed(speed);
+		fb5.setMoveSpeed(speed);
 		
 		ViewPort view1 = viewPort;
 		view1.clearScenes();
@@ -196,7 +207,10 @@ public class Main extends SimpleApplication implements ScreenController {
 		view4.attachScene(rootNode4);
 		view4.setBackgroundColor(ColorRGBA.DarkGray);
 		
-		
+		ViewPort view5 = renderManager.createMainView("View of camera 5", cam5);
+		view5.setClearFlags(true, true, true);
+		view5.attachScene(rootNode5);
+		view5.setBackgroundColor(ColorRGBA.White);
 	}
 
 	@Override

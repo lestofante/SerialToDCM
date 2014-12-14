@@ -519,11 +519,15 @@ public class DCMlogic {
 	}
 
 	public void setStmBypass(float[] q) {
-		stmQuat = q;
+		synchronized (stmQuat) {
+			stmQuat = q;
+		}
 	}
 
 	public Quaternion getQuaternionStm() {
-		return new Quaternion(stmQuat[0],stmQuat[1], stmQuat[2], stmQuat[3]);
+		synchronized (stmQuat) {
+			return new Quaternion(stmQuat[0],stmQuat[1], stmQuat[2], stmQuat[3]);
+		}
 	}
 
 	public void setYprStm(float[] ypr) {

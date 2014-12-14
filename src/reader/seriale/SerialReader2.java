@@ -231,23 +231,27 @@ public class SerialReader2 extends SensorReader implements Runnable {
 			}
 			break;
 		case 6:
-			/*
-			System.out.print("quat:");
+			float q[] = new float[4];
+			//System.out.print("quat:");
 			for (int i=0;i< 4; i++){
 				int ris=0;
 				int ris2=0;
 				for (int f=0;f< 4; f++){
 					ris = ris << 8;
-					ris |= buffer[(3-f)+i*4]& 0xFF;
+					ris |= buffer[(3-f)+i*4] & 0xFF;
 					ris2 = ris2 << 8;
 					ris2 |= buffer[f+i*4] & 0xFF;
 				}
 				float risF = Float.intBitsToFloat(ris);
 				float risF2 = Float.intBitsToFloat(ris2);
-				System.out.print(risF+"/"+risF2+" ");
+				q[i]= risF;
+				//System.out.print(risF+"/"+risF2+" ");
 			}
-			System.out.println();
-			*/
+			dcm.setStmBypass(q);
+			if (a%200 == 0 ){//`7 times at seconds
+				System.out.print("quat:"+q[0]+" "+q[1]+" "+q[2]+" "+q[3]+" ");
+			}
+			//System.out.println();
 			break;
 		case 'S':
 			System.out.print("read/s:");
