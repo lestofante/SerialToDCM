@@ -12,6 +12,8 @@ public class SerialReader2 extends SensorReader implements Runnable {
 	private SerialPort serialPort;
 	
 	private int g=0, m=0, a=0, e=0, q=0;
+
+	private boolean run = true;
 	private static final int toAvoid = 0;
 	//private static final int toRead = 8;
 	
@@ -75,6 +77,7 @@ public class SerialReader2 extends SensorReader implements Runnable {
 			System.out.println("ok2");
 			serialPort.readBytes(6);// Remove next 67 byte
 
+			run = true;
 			new Thread(this).start();// start this thread
 			
 			// serialPort.closePort();//Close serial port
@@ -90,11 +93,19 @@ public class SerialReader2 extends SensorReader implements Runnable {
 		} catch (SerialPortException e) {
 			e.printStackTrace();
 		}
+		
+		try {
+			serialPort.closePort();
+		} catch (SerialPortException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		connect();
 	}
 	private void execute() throws SerialPortException{
 		long time = System.currentTimeMillis();
 		long count = 0;
-		while (true) {
+		while (run) {
 			byte[] buffer = serialPort.readBytes(2);// Read 2 bytes from serial port (header)
 			count += buffer.length;
 			int low = ((int)buffer[0]) & 0xFF;
@@ -157,8 +168,8 @@ public class SerialReader2 extends SensorReader implements Runnable {
 			g++;
 			gyroVec = new Vector3f();
 			for (int i=0; i < 3; i++){
-				int low = buffer[i*2+toAvoid+1] & 0xFF;
-				int high = buffer[i*2+toAvoid]<<8;
+				int low = buffer[i*2+toAvoid] & 0xFF;
+				int high = buffer[i*2+toAvoid+1]<<8;
 				int uint8 = high+low;
 				switch (i) {
 				case 0:
@@ -180,8 +191,8 @@ public class SerialReader2 extends SensorReader implements Runnable {
 			m++;
 			magVec = new Vector3f();
 			for (int i=0; i < 3; i++){
-				int low = buffer[i*2+toAvoid+1] & 0xFF;
-				int high = buffer[i*2+toAvoid]<<8;
+				int low = buffer[i*2+toAvoid] & 0xFF;
+				int high = buffer[i*2+toAvoid+1]<<8;
 				int uint8 = high+low;
 				switch (i) {
 				case 0:
@@ -207,8 +218,8 @@ public class SerialReader2 extends SensorReader implements Runnable {
 			a++;
 			accVec = new Vector3f();
 			for (int i=0; i < 3; i++){
-				int low = buffer[i*2+toAvoid+1] & 0xFF;
-				int high = buffer[i*2+toAvoid]<<8;
+				int low = buffer[i*2+toAvoid] & 0xFF;
+				int high = buffer[i*2+toAvoid+1]<<8;
 				int uint8 = high+low;
 				switch (i) {
 				case 0:
@@ -235,23 +246,17 @@ public class SerialReader2 extends SensorReader implements Runnable {
 			//System.out.print("quat:");
 			for (int i=0;i< 4; i++){
 				int ris=0;
-				int ris2=0;
 				for (int f=0;f< 4; f++){
 					ris = ris << 8;
 					ris |= buffer[(3-f)+i*4] & 0xFF;
-					ris2 = ris2 << 8;
-					ris2 |= buffer[f+i*4] & 0xFF;
 				}
 				float risF = Float.intBitsToFloat(ris);
-				float risF2 = Float.intBitsToFloat(ris2);
 				q[i]= risF;
-				//System.out.print(risF+"/"+risF2+" ");
 			}
 			dcm.setStmBypass(q);
-			if (a%200 == 0 ){//`7 times at seconds
-				System.out.print("quat:"+q[0]+" "+q[1]+" "+q[2]+" "+q[3]+" ");
+			if (g%200 == 0 ){//`7 times at seconds
+				System.out.println("quat:"+q[0]+" "+q[1]+" "+q[2]+" "+q[3]+" "+Math.sqrt(q[0]*q[0]+q[1]*q[1]+q[2]*q[2]+q[3]*q[3]));
 			}
-			//System.out.println();
 			break;
 		case 'S':
 			System.out.print("read/s:");
@@ -274,9 +279,14 @@ public class SerialReader2 extends SensorReader implements Runnable {
 			System.out.println();
 			
 			e++;
+			if (e > 10){
+				System.out.println("Error limit, resetting Serial.");
+				run = false;
+			}
 			return;
 		}
 		System.out.flush();
+		
 		
 		if (gyroVec != null && accVec != null && magVec != null) {
 			if (dcm != null) {
@@ -284,8 +294,8 @@ public class SerialReader2 extends SensorReader implements Runnable {
 						accVec.x, accVec.y, accVec.z, magVec.x,
 						magVec.y, magVec.z);
 			}
-			gyroVec = accVec = magVec = null;
 		}
+		gyroVec = accVec = magVec = new Vector3f();
 		/*
 		if (gyroVec != null && accVec != null) {
 			dcm.update(gyroVec.x, gyroVec.y, gyroVec.z, accVec.x, accVec.y, accVec.z, 0, 0, 0);

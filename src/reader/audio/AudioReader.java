@@ -348,9 +348,11 @@ public class AudioReader extends SensorReader implements Runnable{
 				}
 				
 				if (dcm != null) {
+					/*
 					dcm.MadgwickAHRSupdate(gyroVec.x, gyroVec.y, gyroVec.z, 
 							0, 0, 1, 
 							0, 0, 0);
+					*/
 				}
 				//calibra(gyroVec, new Vector3f(), new Vector3f());
 				gyroVec = null;

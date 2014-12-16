@@ -330,7 +330,7 @@ public class SerialReader extends SensorReader implements SerialPortEventListene
 					*/
 				} 
 				if (gyroVec != null && accVec != null) {
-					dcm.MadgwickAHRSupdate(gyroVec.x, gyroVec.y, gyroVec.z, accVec.x, accVec.y, accVec.z, 0, 0, 0);
+					//dcm.MadgwickAHRSupdate(gyroVec.x, gyroVec.y, gyroVec.z, accVec.x, accVec.y, accVec.z, 0, 0, 0);
 					gyroVec = accVec = null;
 					choosen = 0;
 				}
