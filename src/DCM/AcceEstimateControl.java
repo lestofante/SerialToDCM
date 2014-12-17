@@ -9,11 +9,11 @@ import com.jme3.scene.Spatial;
 import com.jme3.scene.control.AbstractControl;
 import com.jme3.scene.control.Control;
 
-public class AcceControl extends AbstractControl {
+public class AcceEstimateControl extends AbstractControl {
 
 	private final DCMlogic dcm;
 	
-	public AcceControl(final DCMlogic dcm){
+	public AcceEstimateControl(final DCMlogic dcm){
 		this.dcm=dcm;
 	}
 	
@@ -31,7 +31,7 @@ public class AcceControl extends AbstractControl {
 
 	@Override
 	protected void controlUpdate(float g0) {
-		Vector3f yprStm = dcm.getAcc();
+		Vector3f yprStm = dcm.getAcceEstimate();
 		if (yprStm.length() > 0){
 			yprStm.multLocal(20);
 			getSpatial().lookAt(yprStm, new Vector3f(0,1,0));

@@ -3,7 +3,6 @@ package DCM;
 
 import myGame.DCMlogic;
 
-import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.ViewPort;
@@ -36,13 +35,12 @@ public class MagControl extends AbstractControl {
 	
 	@Override
 	protected void controlUpdate(float g0) {
-		getSpatial().getParent().setLocalRotation(new Quaternion(new float[]{0,-(float) (Math.PI/2), 0}));
-		
 		Vector3f yprStm = dcm.getMagn();
-		getSpatial().setLocalRotation(new Quaternion().fromAngles(0, 0, 0));
-		getSpatial().rotate(yprStm.x,0,0);
-		getSpatial().rotate(0,yprStm.z,0);
-		getSpatial().rotate(0,0,yprStm.y);
+		if (yprStm.length() > 0){
+			yprStm.multLocal(20);
+			System.out.println("looking at "+yprStm);
+			getSpatial().lookAt(yprStm, new Vector3f(0,1,0));
+		}
 	}
 
 }

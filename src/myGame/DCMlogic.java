@@ -1,12 +1,10 @@
 package myGame;
 
 import java.awt.Color;
-import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JTextField;
@@ -23,12 +21,12 @@ public class DCMlogic {
 
 	//float twoKp = 2.0f * 1f;
 	//float twoKi = 2.0f * 0.0f;
-	private float twoKpM = 10.0f;
-	private float twoKpA = 2.0f;	
-
-
+	private float KP_M = 10.0f;
+	private float KP_A = 2.0f;	
+	private float KI_M = 0;
+	
 	Vector3f gyro=new Vector3f(), acc=new Vector3f(), magn=new Vector3f(), simpleGyro=new Vector3f();
-
+	private Vector3f magneEstimate = new Vector3f(), acceEstimate = new Vector3f();
 
 	//long lastUp = System.nanoTime();
 	long lastFreqUp=System.currentTimeMillis(), count=-1, countG=0, countM=0,countA=0;
@@ -41,19 +39,26 @@ public class DCMlogic {
 	private float	qPred3;
 	private float	qPred4;
 
-
-	private float integralFBx;
-	private float integralFBy;
-	private float integralFBz;
+	/*
+	private float integralFBxA;
+	private float integralFByA;
+	private float integralFBzA;
+	*/
+	
+	private float integralFBxM;
+	private float integralFByM;
+	private float integralFBzM;
 
 	private float[] stmQuat = new float[4];
 
 	private float[] yprBypass = new float[3];
+
+	
 	
 	
 	public DCMlogic(){
-		final JTextField kpMtxt = new JTextField(twoKpM+"");
-		final JTextField kpAtxt = new JTextField(twoKpA+"");
+		final JTextField kpMtxt = new JTextField(KP_M+"");
+		final JTextField kpAtxt = new JTextField(KP_A+"");
 		JButton apply = new JButton("apply");
 		apply.addActionListener(new ActionListener() {
 			
@@ -62,7 +67,7 @@ public class DCMlogic {
 				String textA = kpAtxt.getText();
 				String textM = kpMtxt.getText();
 				try{
-					twoKpA = Float.parseFloat(textA);
+					KP_A = Float.parseFloat(textA);
 					kpAtxt.setBackground(Color.white);
 				}catch(Exception e1){
 					e1.printStackTrace();
@@ -70,7 +75,7 @@ public class DCMlogic {
 				}
 				
 				try{
-					twoKpM = Float.parseFloat(textM);
+					KP_M = Float.parseFloat(textM);
 					kpMtxt.setBackground(Color.white);
 				}catch(Exception e1){
 					e1.printStackTrace();
@@ -155,14 +160,23 @@ public class DCMlogic {
 			halfwy = bx * (q1q2 - q0q3) + bz * (q0q1 + q2q3);
 			halfwz = bx * (q0q2 + q1q3) + bz * (0.5f - q1q1 - q2q2);
 			
+			magneEstimate = new Vector3f(halfwx,halfwy,halfwz);
+			
 			float norm = invSqrt(halfwx*halfwx+halfwy*halfwy+halfwz*halfwz);
 			halfwx*=norm;
 			halfwy*=norm;
 			halfwz*=norm;
 			
-			halfex += twoKpM * (my * halfwz - mz * halfwy) * (1.0f / sampleFreqM);
-			halfey += twoKpM * (mz * halfwx - mx * halfwz) * (1.0f / sampleFreqM);
-			halfez += twoKpM * (mx * halfwy - my * halfwx) * (1.0f / sampleFreqM);
+			
+			float freqMagne = (1.0f / sampleFreqM);
+			integralFBxM += halfex * freqMagne * KI_M;
+			integralFByM += halfey * freqMagne * KI_M;
+			integralFBzM += halfez * freqMagne * KI_M;
+			
+			
+			halfex += KP_M * (my * halfwz - mz * halfwy) * freqMagne + integralFBxM;
+			halfey += KP_M * (mz * halfwx - mx * halfwz) * freqMagne + integralFByM;
+			halfez += KP_M * (mx * halfwy - my * halfwx) * freqMagne + integralFBzM;
 			
 		}
 
@@ -182,9 +196,11 @@ public class DCMlogic {
 			halfvy = q0q1 + q2q3;
 			halfvz = q0q0 - 0.5f + q3q3;
 			
-			halfex += twoKpA * (ay * halfvz - az * halfvy) * (1.0f / sampleFreqA);
-			halfey += twoKpA * (az * halfvx - ax * halfvz) * (1.0f / sampleFreqA);
-			halfez += twoKpA * (ax * halfvy - ay * halfvx) * (1.0f / sampleFreqA);
+			acceEstimate = new Vector3f(halfvx, halfvy, halfvz);
+			
+			halfex += KP_A * (ay * halfvz - az * halfvy) * (1.0f / sampleFreqA);
+			halfey += KP_A * (az * halfvx - ax * halfvz) * (1.0f / sampleFreqA);
+			halfez += KP_A * (ax * halfvy - ay * halfvx) * (1.0f / sampleFreqA);
 		}
 		
 		countG++;
@@ -280,9 +296,7 @@ public class DCMlogic {
 	}
 
 	public Vector3f getMagn() {
-		synchronized (sincronizzaUpdate) {
-			return new Vector3f(magn); //copy!
-		}
+		return magn; //copy!
 	}
 
 	public void setStmBypass(float[] q) {
@@ -311,5 +325,13 @@ public class DCMlogic {
 
 	public void update(float x, float y, float z, float x2, float y2, float z2, float x3, float y3, float z3) {
 		FreeIMUUpdate(x, y, z, x2, y2, z2, x3, y3, z3);
+	}
+
+	public Vector3f getMagnEstimate() {
+		return magneEstimate;
+	}
+	
+	public Vector3f getAcceEstimate() {
+		return acceEstimate;
 	}
 }

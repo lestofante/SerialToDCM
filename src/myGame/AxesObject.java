@@ -6,7 +6,7 @@ import com.jme3.math.Quaternion;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 
-public class AxesObject {
+public class AxesObject{
 	
 	private Node createGeometry(AssetManager assetManager) {
 		

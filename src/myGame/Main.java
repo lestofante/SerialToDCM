@@ -4,10 +4,12 @@ import myGame.GUI.GuiManager;
 import reader.SensorReader;
 import reader.seriale.SerialReader2;
 import DCM.AcceControl;
+import DCM.AcceEstimateControl;
 import DCM.DCMControl;
 import DCM.DirectQuaternionControl;
 import DCM.GyroControl;
 import DCM.MagControl;
+import DCM.MagEstimateControl;
 
 import com.jme3.app.SimpleApplication;
 import com.jme3.math.ColorRGBA;
@@ -39,11 +41,7 @@ public class Main extends SimpleApplication implements ScreenController {
 	Node rootNode4 = new Node();
 	Node rootNode5 = new Node();
 
-	AxesObject obj1;
-	AxesObject obj2;
-	AxesObject obj3;
-	AxesObject obj4;
-	AxesObject obj5;
+	
 	
 	DCMlogic dcm = new DCMlogic();
 	
@@ -66,11 +64,15 @@ public class Main extends SimpleApplication implements ScreenController {
 	@Override
 	public void simpleInitApp() {
 		setupViewPorts();
-		
+		AxesObject obj1;
+		RectangleObject obj2;
+		AxesObject obj3;
+		RectangleObject obj4;
+		AxesObject obj5;
 		obj1 = new AxesObject(assetManager);
-		obj2 = new AxesObject(assetManager);
+		obj2 = new RectangleObject(assetManager);
 		obj3 = new AxesObject(assetManager);
-		obj4 = new AxesObject(assetManager);
+		obj4 = new RectangleObject(assetManager);
 		obj5 = new AxesObject(assetManager);
 		
 		/*
@@ -87,9 +89,15 @@ public class Main extends SimpleApplication implements ScreenController {
 		*/
 		
 		obj1.getGeometry().addControl(new DCMControl(dcm));
-		obj2.getGeometry().addControl(new AcceControl(dcm));
+		
+		obj2.getMovingGeometry1().addControl(new AcceControl(dcm));
+		obj2.getMovingGeometry2().addControl(new AcceEstimateControl(dcm));
+		
 		obj3.getGeometry().addControl(new GyroControl(dcm));
-		obj4.getGeometry().addControl(new MagControl(dcm));
+		
+		obj4.getMovingGeometry1().addControl(new MagControl(dcm));
+		obj4.getMovingGeometry2().addControl(new MagEstimateControl(dcm));
+		
 		obj5.getGeometry().addControl(new DirectQuaternionControl(dcm));
 		
 		
@@ -155,8 +163,9 @@ public class Main extends SimpleApplication implements ScreenController {
 		cam4.setViewPort(0.0f,0.5f,0.5f,1.0f); // resize the viewPort
 		cam4.setLocation(new Vector3f(new Vector3f(0.0f, 40.0f, 0.0f)));
 		cam4.lookAt(Vector3f.ZERO, Vector3f.UNIT_Y);
+		
 		Camera cam5 = cam.clone();
-		cam5.setViewPort(0.0f,0.5f,0.5f,1.0f); // resize the viewPort
+		cam5.setViewPort(1f,2f,0.5f,1.0f); // resize the viewPort
 		cam5.setLocation(new Vector3f(new Vector3f(0.0f, 40.0f, 0.0f)));
 		cam5.lookAt(Vector3f.ZERO, Vector3f.UNIT_Y);
 		

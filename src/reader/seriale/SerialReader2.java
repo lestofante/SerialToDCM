@@ -102,6 +102,8 @@ public class SerialReader2 extends SensorReader implements Runnable {
 		}
 		connect();
 	}
+	
+	Vector3f lastMagn;
 	private void execute() throws SerialPortException{
 		long time = System.currentTimeMillis();
 		long count = 0;
@@ -148,8 +150,8 @@ public class SerialReader2 extends SensorReader implements Runnable {
 			if (System.currentTimeMillis() - time >= 1000) {
 				long timeElaplsed = System.currentTimeMillis() - time;
 				System.out.println("velocità lettura B/s: " + count * (timeElaplsed / 1000));
-				System.out.println("letture g/a/m/errori/queternioni: " + g+"/"+ a+"/"+ m+"/"+e+"/"+q);
-				g=a=m=e=q=0;
+				System.out.println("letture g/a/m/errori/queternioni/mReal: " + g+"/"+ a+"/"+ m+"/"+e+"/"+q+"/"+mReal);
+				g=a=m=e=q=mReal=0;
 				count = 0;
 				time = System.currentTimeMillis();
 			}
@@ -161,6 +163,8 @@ public class SerialReader2 extends SensorReader implements Runnable {
 	final float mdpsOverDigitAt250 = 8.75f;
 	final float mdpsOverDigitAt500 = 17.5f;
 	final float mdpsOverDigitAt2000 = 70;
+
+	private int mReal=0;
 	private void analize(byte header, byte[] buffer) { //remember; message are left to right
 		
 		switch ( header ) {
@@ -189,6 +193,7 @@ public class SerialReader2 extends SensorReader implements Runnable {
 			break;
 		case 2:
 			m++;
+
 			magVec = new Vector3f();
 			for (int i=0; i < 3; i++){
 				int low = buffer[i*2+toAvoid] & 0xFF;
@@ -205,14 +210,23 @@ public class SerialReader2 extends SensorReader implements Runnable {
 					break;
 				case 2:
 					//magVec.x = uint8;
-					magVec.z = uint8;
+					magVec.z = uint8;//this sensor is really bastard inside
 					break;
 				}
 			}
-			magVec = magVec.normalize();
+			
 			if (m%70 == 0 ){
-				System.out.println("M:"+magVec);
+				System.out.println("M:"+magVec+" "+magVec.length());
 			}
+			
+			magVec = magVec.normalize();
+			
+			if (lastMagn != null && !magVec.equals(lastMagn)){
+				System.out.println("Mdiff:"+ magVec+" "+lastMagn+" "+ (magVec.length()-lastMagn.length()) );
+				mReal++;
+			}
+			
+			lastMagn = magVec;
 			break;
 		case 1:
 			a++;
@@ -293,9 +307,10 @@ public class SerialReader2 extends SensorReader implements Runnable {
 				dcm.update(gyroVec.x, gyroVec.y, gyroVec.z,
 						accVec.x, accVec.y, accVec.z, magVec.x,
 						magVec.y, magVec.z);
+				gyroVec = accVec = magVec = new Vector3f();
 			}
 		}
-		gyroVec = accVec = magVec = new Vector3f();
+		
 		/*
 		if (gyroVec != null && accVec != null) {
 			dcm.update(gyroVec.x, gyroVec.y, gyroVec.z, accVec.x, accVec.y, accVec.z, 0, 0, 0);
